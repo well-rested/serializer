@@ -1,6 +1,8 @@
 IMG_TAG ?= well-rested/serializer:local
 IMG_BASE_VERSION ?= 8.4
 
+DOCS_DC=docker compose -p well-rested-serializer-docs -f ./docker-compose.docs.yml
+
 DOCKER_RUN=docker run -v "$(shell pwd):/srv" -w /srv -it --rm $(IMG_TAG)
 DOCKER_RUN_NON_INTERACTIVE=docker run -v "$(shell pwd):/srv" -w /srv --rm $(IMG_TAG)
 
@@ -69,14 +71,26 @@ exec:
 test:
 	$(DOCKER_RUN) composer test
 
+# Run the lint command for composer; see composer.json for details
 lint:
 	$(DOCKER_RUN) composer lint
 
+# Fix any cs issues in the codebase
 csfix:
 	$(DOCKER_RUN) composer csfix
 
+# Runs the csfix dry run for githooks. Main difference is that for githooks we 
+# cannot use -it flag for interactivity
 csfix-hook:
 	$(DOCKER_RUN_NON_INTERACTIVE) composer csfix
+
+# Start the docs server
+mkdocs-up:
+	$(DOCS_DC) up -d
+
+# Stop the docs server
+mkdocs-down:
+	$(DOCS_DC) down --remove-orphans
 
 # Lints the last commit on the current branch to ensure it adheres to the standards
 # set out by commit lint.

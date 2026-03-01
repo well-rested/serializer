@@ -38,6 +38,7 @@
         "phpstan/phpstan": "^2.1"
     },
     "require": {
-        "php": "^8.4"
+        "php": "^8.4",
+        "phpoption/phpoption": "^1.9"
     }
 }

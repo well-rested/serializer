@@ -1,5 +1,7 @@
-LOCAL_TAG=serializer:local
-DOCKER_RUN=docker run -v "$(shell pwd):/srv" -w /srv -it --rm $(LOCAL_TAG)
+IMG_TAG ?= well-rested/serializer:local
+IMG_BASE_VERSION ?= 8.4
+
+DOCKER_RUN=docker run -v "$(shell pwd):/srv" -w /srv -it --rm $(IMG_TAG)
 
 .PHONY: exec build init copy-phpunit-xml verify
 
@@ -51,7 +53,7 @@ init: verify copy-phpunit-xml build
 
 # Build the docker image for local development
 build:
-	docker build -t $(LOCAL_TAG) .
+	docker build -t $(IMG_TAG) .
 
 # Exec into a php runtime where you can run things
 exec:
@@ -59,7 +61,7 @@ exec:
 
 # Run the tests within the php runtime (via docker)
 test:
-	$(DOCKER_RUN) ./vendor/bin/phpunit
+	$(DOCKER_RUN) composer test
 
 # Lints the last commit on the current branch to ensure it adheres to the standards
 # set out by commit lint.

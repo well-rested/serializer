@@ -3,6 +3,9 @@
     "description": "Package for serialization",
     "type": "library",
     "license": "MIT",
+    "scripts": {
+        "test": "./vendor/bin/phpunit"
+    },
     "autoload": {
         "psr-4": {
             "WellRested\\Serializer\\": "src/"

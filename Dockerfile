@@ -1,7 +1,11 @@
-FROM php:8.4-cli AS dev
+ARG IMG_BASE_VERSION="8.4"
+FROM php:${IMG_BASE_VERSION}-cli
 
-COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
+RUN apt-get update \
+    && apt-get install -y libzip-dev zip \
+    && docker-php-ext-install zip
 
-# For composer installs
-RUN apt-get update -y
-RUN apt-get install -y git zip
+COPY ./scripts/install_composer.sh /install_composer.sh
+RUN chmod +x /install_composer.sh
+
+RUN /install_composer.sh

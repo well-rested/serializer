@@ -34,6 +34,8 @@ jobs:
           docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer install
       - name: "csfix"
         run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer csfix-dry-run
+      - name: "stan"
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer stan
       - name: "phpunit"
         run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer test
 

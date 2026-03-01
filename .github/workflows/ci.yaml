@@ -32,7 +32,9 @@ jobs:
       - name: "Install composer dependencies"
         run: |
           docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer install
-      - name: "Run tests"
+      - name: "csfix"
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer csfix-dry-run
+      - name: "phpunit"
         run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer test
 
   # Here so we can have a reliable status check for branch rulesets

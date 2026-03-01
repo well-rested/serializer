@@ -2,8 +2,11 @@ IMG_TAG ?= well-rested/serializer:local
 IMG_BASE_VERSION ?= 8.4
 
 DOCKER_RUN=docker run -v "$(shell pwd):/srv" -w /srv -it --rm $(IMG_TAG)
+DOCKER_RUN_NON_INTERACTIVE=docker run -v "$(shell pwd):/srv" -w /srv --rm $(IMG_TAG)
 
-.PHONY: exec build init copy-phpunit-xml verify
+.PHONY: exec build init copy-phpunit-xml verify lint check-docker \
+	check-node-npm-versions lint-last-commit setup-githooks setup-pre-commit-hook \
+	csfix csfix-hook
 
 # Chances are this will work on quite a lot of version of node/npm. We only use
 # it for commitlint which is optional really. It will just warn if the versions
@@ -41,6 +44,9 @@ check-docker:
 		exit 1; \
 	fi; \
 
+setup-githooks:
+	git config --local core.hooksPath .githooks/
+
 # Verify that any requirements are present for local development
 verify: check-docker check-node-npm-versions
 
@@ -49,7 +55,7 @@ copy-phpunit-xml:
 	if [ ! -f phpunit.xml ]; then cp phpunit.xml.dist phpunit.xml; fi
 
 # Initialise the application repo for development
-init: verify copy-phpunit-xml build
+init: verify setup-githooks copy-phpunit-xml build
 
 # Build the docker image for local development
 build:
@@ -62,6 +68,15 @@ exec:
 # Run the tests within the php runtime (via docker)
 test:
 	$(DOCKER_RUN) composer test
+
+lint:
+	$(DOCKER_RUN) composer lint
+
+csfix:
+	$(DOCKER_RUN) composer csfix
+
+csfix-hook:
+	$(DOCKER_RUN_NON_INTERACTIVE) composer csfix
 
 # Lints the last commit on the current branch to ensure it adheres to the standards
 # set out by commit lint.

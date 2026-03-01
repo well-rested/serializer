@@ -1,0 +1,11 @@
+/vendor/
+
+# PHPUnit
+.phpunit.cache
+phpunit.xml
+
+# CS Fixer
+.php-cs-fixer.cache
+
+# NPM
+node_modules

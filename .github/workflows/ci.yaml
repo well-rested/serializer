@@ -1,0 +1,57 @@
+name: CI checks
+run-name: "CI checks - ${{ github.event.number || github.ref_name }} (${{ github.sha }})"
+on: 
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    # Run at 1am every monday 
+    - cron: "0 1 * * 1"
+
+env:
+  IMG_NAME: well-rested/serializer:testing
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  run_checks:
+    name: "Run CI checks"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - "8.4"
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Build runtime image"
+        run: IMG_BASE_VERSION=${{ matrix.version }} IMG_TAG=${{ env.IMG_NAME }} make build
+      - name: "Install composer dependencies"
+        run: |
+          docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer install
+      - name: "csfix"
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer csfix-dry-run
+      - name: "stan"
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer stan
+      - name: "phpunit"
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer test
+
+  # Here so we can have a reliable status check for branch rulesets
+  # Simply pointing the ruleset at the matrix, it gets stuck in waiting for status to be reported.
+  status:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    name: report_status
+    needs:
+      - run_checks
+    steps:
+      - run: |
+          result="${{ needs.run_checks.result }}"
+          if [[ $result == "success" || $result == "skipped" ]]; then
+            exit 0
+          else
+            exit 1
+          fi

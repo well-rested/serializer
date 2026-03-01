@@ -1,0 +1,43 @@
+{
+    "name": "well-rested/serializer",
+    "description": "Package for serialization",
+    "type": "library",
+    "license": "MIT",
+    "scripts": {
+        "test": "./vendor/bin/phpunit",
+        "csfix": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php src tests",
+        "csfix-dry-run": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php --dry-run src tests",
+        "stan": "./vendor/bin/phpstan analyse -c phpstan.neon",
+        "lint": [
+            "@csfix-dry-run",
+            "@stan"
+        ]
+    },
+    "autoload": {
+        "psr-4": {
+            "WellRested\\Serializer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Adam Kirk",
+            "email": "adam_kirk@live.co.uk",
+            "homepage": "https://github.com/adamkirk",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require-dev": {
+        "phpunit/phpunit": "^13.0",
+        "friendsofphp/php-cs-fixer": "^3.94",
+        "phpstan/phpstan": "^2.1"
+    },
+    "require": {
+        "php": "^8.4"
+    }
+}

@@ -1,0 +1,12 @@
+services:
+# --- docs --- #
+  mkdocs:
+    image: squidfunk/mkdocs-material:latest
+    ports:
+      # Arbitraty port thats unlikely, I think, to conflict with anything else
+      - 8794:8000
+    working_dir: /app
+    restart: unless-stopped
+    command: ["serve", "--watch", "./docs", "--watch", "mkdocs.yml", "-a", "0.0.0.0:8000"]
+    volumes:
+      - .:/app

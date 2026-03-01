@@ -22,7 +22,7 @@ class IntersectionTypeDefinition extends TypeDefinitionAbstract
 			throw new InvalidArgumentException('a union type must have at least two possible types');
 		}
 
-		$this->possibleTypes = array_unique($possibleTypes);
+		$this->possibleTypes = array_unique(array_values($possibleTypes));
 	}
 
 	public function getName(): string

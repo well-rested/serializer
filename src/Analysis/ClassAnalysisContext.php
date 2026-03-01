@@ -6,12 +6,13 @@ namespace WellRested\Serializer\Analysis;
 
 class ClassAnalysisContext
 {
+	protected AnalysisChain $chain;
+
 	public function __construct(
-		protected ?AnalysisChain $chain = null,
+		/** @property AnalysisChain $chain Override actual type for PHPStan as it thinks it can be null*/
+		?AnalysisChain $chain = null,
 	) {
-		if (null === $this->chain) {
-			$this->chain = new AnalysisChain();
-		}
+		$this->chain = null === $chain ? new AnalysisChain() : $chain;
 	}
 
 	public function addLink(AnalysisLink $link): self

@@ -20,7 +20,9 @@ class UnionTypeDefinition extends TypeDefinitionAbstract
 			throw new InvalidArgumentException('a union type must have at least two possible types');
 		}
 
-		$this->possibleTypes = array_unique($possibleTypes);
+		// Array values here to make phpstan happy, otherwise it thinks the keys
+		// can be int|string; not sure how that would ever happen though
+		$this->possibleTypes = array_unique(array_values($possibleTypes));
 	}
 
 	/** @return TypeDefinitionAbstract[] */

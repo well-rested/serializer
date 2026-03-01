@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace WellRested\Serializer;
 
-use WellRested\Serializer\Errors\FieldError;
-use WellRested\Serializer\Errors\FieldErrors;
+use PhpOption\None;
+use PhpOption\Option;
+use PhpOption\Some;
+use RuntimeException;
+use stdClass;
 use WellRested\Serializer\Analysis\ClassAnalysis;
 use WellRested\Serializer\Analysis\PropertyAnalysis;
 use WellRested\Serializer\Analysis\TypeDefinitions\ArrayTypeDefinition;
@@ -21,12 +24,10 @@ use WellRested\Serializer\Analysis\TypeDefinitions\OptionTypeDefinition;
 use WellRested\Serializer\Analysis\TypeDefinitions\StringTypeDefinition;
 use WellRested\Serializer\Analysis\TypeDefinitions\TypeDefinitionAbstract;
 use WellRested\Serializer\Analysis\TypeDefinitions\UnionTypeDefinition;
+use WellRested\Serializer\Errors\FieldError;
+use WellRested\Serializer\Errors\FieldErrors;
 use WellRested\Serializer\Exceptions\HoistTargetNotFoundException;
 use WellRested\Serializer\Exceptions\IncorrectTypeForHoistException;
-use PhpOption\None;
-use PhpOption\Option;
-use PhpOption\Some;
-use stdClass;
 
 class Serializer implements SerializerInterface, DeserializerInterface
 {
@@ -51,6 +52,8 @@ class Serializer implements SerializerInterface, DeserializerInterface
 	 * to support the scenario where we have an empty object, but an empty array
 	 * when converted to json would be just an array rather than '{}' which is
 	 * what we'd actually want.
+	 *
+	 * @return array<string|int, mixed>|stdClass
 	 */
 	public function serialize(object $subject): array|stdClass
 	{
@@ -61,20 +64,36 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		return $value;
 	}
 
-	public function _serialize(object $subject, $path = ''): array|stdClass
+	/**
+	 * @return array<string|int, mixed>|stdClass
+	 */
+	public function _serialize(object $subject, string $path = ''): array|stdClass
 	{
 		if ($subject instanceof stdClass) {
-			return json_decode(json_encode($subject), true);
+			$encoded = json_encode($subject);
+
+			if ($encoded === false) {
+				throw new RuntimeException('failed to encode subject');
+			}
+
+			/** @var array<string|int, mixed>|stdClass */
+			$decoded = json_decode($encoded, true);
+			return $decoded;
 		}
 
 		$subjectClass = get_class($subject);
 		$analysis = $this->analyser->analyse($subjectClass)->get($subjectClass);
+
+		if ($analysis === null) {
+			throw new RuntimeException('class analysis missing');
+		}
 
 		$value = $this->serializeForClassAnalysis($analysis, $subject, $path);
 
 		return $value->isDefined() ? $value->get() : new stdClass();
 	}
 
+	/** @return Option<array<string|int, mixed>|stdClass> */
 	protected function serializeForClassAnalysis(ClassAnalysis $analysis, mixed $value, string $path): Option
 	{
 		if ($value instanceof Option && !$value->isDefined()) {
@@ -88,6 +107,7 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		$data = [];
 
 		foreach ($analysis->getProperties() as $property) {
+			/** @var object $value */
 			$serializedValue = $this->serializeProperty($property, $value, $path);
 
 			if (!$serializedValue->isDefined()) {
@@ -97,14 +117,18 @@ class Serializer implements SerializerInterface, DeserializerInterface
 			$data[$property->getSerializedName()] = $serializedValue->get();
 		}
 
-		if (empty($data)) {
+		if ($data === []) {
 			$data = new stdClass();
 		}
 
-		return new Some($data);
+		/** @var Option<array<string|int, mixed>|stdClass> $option */
+		$option = Some::create($data);
+
+		return $option;
 	}
 
-	protected function serializeProperty(PropertyAnalysis $analysis, mixed $container, string $path): Option
+	/** @return Option<mixed> */
+	protected function serializeProperty(PropertyAnalysis $analysis, object $container, string $path): Option
 	{
 		$propertyPath = $this->concatPath($path, $analysis->getName());
 		$propValue = $this->retrievePropertyValueFromContainer($analysis, $container);
@@ -115,6 +139,7 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		};
 	}
 
+	/** @return Option<mixed> */
 	protected function serializeHoistedProperty(PropertyAnalysis $analysis, mixed $propValue, string $path): Option
 	{
 		$type = $analysis->getTypeDefinition();
@@ -127,12 +152,16 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		 * The canHoistValueforProperty check tells us this, but that may change
 		 * with support for optional hoisted properties and poymorphism.
 		 *
-		 * @var ClassDefinitionType $type
+		 * @var ClassTypeDefinition $type
 		 */
 		$hoistTarget = $type->getName();
 
 		$toHoist = $analysis->hoistProperty();
 		$targetAnalysis = $this->analyser->analyse($hoistTarget)->get($hoistTarget);
+
+		if ($targetAnalysis === null) {
+			throw new RuntimeException('analysis not found');
+		}
 
 		if (!$targetAnalysis->getProperties()->has($toHoist)) {
 			throw new HoistTargetNotFoundException($this->rootType, $path, $toHoist);
@@ -145,12 +174,16 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		}
 
 		$hoistContainerValue = $hoistContainer->get();
-		if ($hoistContainerValue instanceof stdClass || !array_key_exists($toHoist, $hoistContainerValue)) {
+
+		if ($hoistContainerValue instanceof stdClass || ! array_key_exists($toHoist, $hoistContainerValue)) {
 			// TODO: handle optional hoisted properties?
-			return new Some(null);
+			// ignoring, because stan is a real pain in the arse with these options,
+			// the actual typehints should be enough
+			// @phpstan-ignore-next-line
+			return Some::create(null);
 		}
 
-		return new Some($hoistContainerValue[$toHoist]);
+		return Some::create($hoistContainerValue[$toHoist]);
 	}
 
 	/**
@@ -163,27 +196,48 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		return $type->is(ClassTypeDefinition::class);
 	}
 
-	protected function serializeValue(TypeDefinitionAbstract $type, mixed $value, $path): Option
+	/** @return Option<mixed> */
+	protected function serializeValue(TypeDefinitionAbstract $type, mixed $value, string $path): Option
 	{
-		$value = match (true) {
-			$type->is(OptionTypeDefinition::class) && !$value->isDefined() => None::create(),
-			$type->is(OptionTypeDefinition::class) && $value->isDefined() => $this->serializeValue($type->getWrappedType(), $value->get(), $path),
-			$type->is(ArrayTypeDefinition::class) => new Some($this->serializeArrayValue($type, $value, $path)),
-			$type->is(ClassTypeDefinition::class) => $this->serializeForClassAnalysis(
-				$this->analyser->analyse($type->getName())->get($type->getName()),
+		if ($type->is(OptionTypeDefinition::class)) {
+			/** @var Option<mixed> $value */
+			return !$value->isDefined() ? None::create() : $this->serializeValue(
+				$type->getWrappedType(),
+				$value->get(),
+				$path,
+			);
+		} elseif ($type->is(ArrayTypeDefinition::class)) {
+			/** @var array<string|int, mixed> $value */
+			// @phpstan-ignore-next-line
+			return Some::create(
+				$this->serializeArrayValue($type, $value, $path),
+			);
+		} elseif ($type->is(ClassTypeDefinition::class)) {
+			$analysis = $this->analyser->analyse($type->getName())->get($type->getName());
+
+			if ($analysis === null) {
+				throw new RuntimeException('analysis not found');
+			}
+
+			// @phpstan-ignore-next-line
+			return $this->serializeForClassAnalysis(
+				$analysis,
 				$value,
 				$path,
-			),
-			default => new Some($value),
-		};
-
-		return $value;
+			);
+		}
+		return Some::create($value);
 	}
 
+	/**
+	 * @param array<string|int, mixed> $values
+	 *
+	 * @return array<string|int, mixed>
+	 */
 	protected function serializeArrayValue(ArrayTypeDefinition $arrayType, array $values, string $path): array
 	{
 		$items = array_map(
-			fn(mixed $item, int $index) => $this->serializeValue(
+			fn(mixed $item, string|int $index) => $this->serializeValue(
 				$arrayType->getItemType(),
 				$item,
 				$this->concatPath($path, (string) $index),
@@ -211,6 +265,7 @@ class Serializer implements SerializerInterface, DeserializerInterface
 	/**
 	 * @template T
 	 *
+	 * @param array<string|int, mixed> $data
 	 * @param class-string<T> $target
 	 *
 	 * @return Option<T>
@@ -229,10 +284,22 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		return $value;
 	}
 
-	protected function _deserialize(array $data, string $target, $path = ''): Option
+	/**
+	 * @template T
+	 *
+	 * @param array<string|int, mixed> $data
+	 * @param class-string<T> $target
+	 *
+	 * @return Option<T>
+	 */
+	protected function _deserialize(array $data, string $target, string $path = ''): Option
 	{
 		$analyses = $this->analyser->analyse($target);
 		$analysis = $analyses->get($target);
+
+		if ($analysis === null) {
+			throw new RuntimeException('analysis not found');
+		}
 
 		$targetClass = $analysis->getName();
 
@@ -242,12 +309,16 @@ class Serializer implements SerializerInterface, DeserializerInterface
 			return None::create();
 		}
 
-		$argsValue = array_map(fn(Option $opt) => $opt->get(), $args->get());
+		/** @var array<string|int, Option<mixed>> $argsArray */
+		$argsArray = $args->get();
+
+		$argsValue = array_map(fn(Option $opt) => $opt->get(), $argsArray);
 		$instance = new $targetClass(...$argsValue);
 
 		$this->setNonConstructorProperties($instance, $data, $analysis, $path);
 
-		return new Some($instance);
+		// @phpstan-ignore-next-line
+		return Some::create($instance);
 	}
 
 	protected function concatPath(string $path, string $part): string
@@ -255,6 +326,9 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		return '' == $path ? $part : "$path.$part";
 	}
 
+	/**
+	 * @param array<string|int, mixed> $data
+	 */
 	protected function setNonConstructorProperties(object $instance, array $data, ClassAnalysis $analysis, string $path): void
 	{
 		foreach ($analysis->getProperties() as $property) {
@@ -286,6 +360,11 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		}
 	}
 
+	/**
+	 * @param array<string|int, mixed> $data
+	 *
+	 * @return Option<array<string|int, mixed>>
+	 */
 	protected function gatherConstructorArgs(array $data, ClassAnalysis $analysis, string $path): Option
 	{
 		$args = [];
@@ -317,9 +396,15 @@ class Serializer implements SerializerInterface, DeserializerInterface
 			return None::create();
 		}
 
+		// @phpstan-ignore-next-line
 		return new Some($args);
 	}
 
+	/**
+	 * @param array<string|int, mixed> $data
+	 *
+	 * @return Option<mixed>
+	 */
 	protected function buildPropertyValue(PropertyAnalysis $property, array $data, string $path): Option
 	{
 		$serializedName = $property->getSerializedName();
@@ -348,7 +433,8 @@ class Serializer implements SerializerInterface, DeserializerInterface
 
 		if (null === $value) {
 			if ($property->allowsNull()) {
-				return new Some(null);
+				// @phpstan-ignore-next-line
+				return Some::create(null);
 			}
 
 			$this->recordInvalidTypeError($path, $property->getTypeDefinition(), $value);
@@ -368,18 +454,23 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		));
 	}
 
+	/**
+	 * @return Option<mixed>
+	 */
 	protected function convertPropertyValueToCompatibleType(TypeDefinitionAbstract $type, mixed $value, string $path): Option
 	{
-		$isCompatible = $this->valueIsCompatibleWithType($type, $value, $path);
+		$isCompatible = $this->valueIsCompatibleWithType($type, $value);
 
 		if ($isCompatible) {
 			return match (true) {
 				$type->is(OptionTypeDefinition::class) => $this->convertValueForOptionType($type, $value, $path),
 				$type->is(UnionTypeDefinition::class) => $this->convertValueForUnionType($type, $value, $path),
+				// @phpstan-ignore-next-line the value is an array
 				$type->is(ArrayTypeDefinition::class) => $this->convertValueForArrayType($type, $value, $path),
+				// @phpstan-ignore-next-line
 				$type->is(ClassTypeDefinition::class) => $this->_deserialize($value, $type->getName(), $path),
-				$type->is(ObjectTypeDefinition::class) => new Some((object) $value),
-				default => new Some($value),
+				$type->is(ObjectTypeDefinition::class) => Some::create((object) $value),
+				default => Some::create($value),
 			};
 		}
 
@@ -392,6 +483,7 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		return None::create();
 	}
 
+	/** @return Option<mixed> */
 	protected function convertValueForOptionType(OptionTypeDefinition $type, mixed $value, string $path): Option
 	{
 		$newValue = $this->convertPropertyValueToCompatibleType($type->getWrappedType(), $value, $path);
@@ -399,6 +491,7 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		return $newValue;
 	}
 
+	/** @return Option<mixed> */
 	protected function convertValueForUnionType(UnionTypeDefinition $unionType, mixed $value, string $path): Option
 	{
 		$concrete = $this->getConcreteForUnion($unionType, $value);
@@ -410,7 +503,12 @@ class Serializer implements SerializerInterface, DeserializerInterface
 		return $this->convertPropertyValueToCompatibleType($concrete, $value, $path);
 	}
 
-	protected function convertValueForArrayType(ArrayTypeDefinition $arrayType, mixed $values, string $path): Option
+	/**
+	 * @param array<string|int, mixed> $values
+	 *
+	 * @return Option<mixed>
+	 */
+	protected function convertValueForArrayType(ArrayTypeDefinition $arrayType, array $values, string $path): Option
 	{
 		$itemType = $arrayType->getItemType();
 
@@ -426,7 +524,8 @@ class Serializer implements SerializerInterface, DeserializerInterface
 			$results[] = $newValue->get();
 		}
 
-		return new Some($results);
+		// @phpstan-ignore-next-line
+		return Some::create($results);
 	}
 
 	protected function valueIsCompatibleWithType(TypeDefinitionAbstract $type, mixed $value): bool

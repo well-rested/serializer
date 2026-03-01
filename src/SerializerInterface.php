@@ -9,6 +9,7 @@ use stdClass;
 
 interface SerializerInterface
 {
+	/** @return array<string|int,mixed>|stdClass */
 	public function serialize(object $data): array|stdClass;
 
 	public function getRaisedErrors(): FieldErrors;

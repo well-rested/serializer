@@ -22,8 +22,12 @@ class Coercer implements CoercerInterface
 
 	public function coerce(TypeDefinitionAbstract $type, mixed $value): mixed
 	{
+		// Address union here, as it's hard to do this nicely in one line in the match
+		if ($type->is(UnionTypeDefinition::class) && ($coercableType = $this->getCoercableTypeForUnion($type, $value)) !== null) {
+			return $this->coerce($coercableType, $value);
+		}
+
 		return match (true) {
-			$type->is(UnionTypeDefinition::class) => $this->coerce($this->getCoercableTypeForUnion($type, $value), $value),
 			$type->is(BoolTypeDefinition::class) => $this->castToBool($value),
 			$type->is(IntegerTypeDefinition::class) => $this->castToInt($value),
 			$type->is(FloatTypeDefinition::class) => $this->castToFloat($value),
@@ -109,13 +113,14 @@ class Coercer implements CoercerInterface
 		throw new InvalidArgumentException('cannot cast value to string');
 	}
 
-	protected function isBooleanString($value): bool
+	protected function isBooleanString(string $value): bool
 	{
 		$value = strtolower($value);
 
 		return in_array($value, $this->getNegativeBooleanStrings()) || in_array($value, $this->getPositiveBooleanStrings());
 	}
 
+	/** @return array<int, string> */
 	protected function getPositiveBooleanStrings(): array
 	{
 		return [
@@ -125,6 +130,7 @@ class Coercer implements CoercerInterface
 		];
 	}
 
+	/** @return array<int, string> */
 	protected function getNegativeBooleanStrings(): array
 	{
 		return [

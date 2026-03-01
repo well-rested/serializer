@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace WellRested\Serializer\Analysis\TypeDefinitions;
 
 use InvalidArgumentException;
-use WellRested\Serializer\Attributes\Field;
 use PhpOption\Option;
 use ReflectionNamedType;
 use ReflectionProperty;
+use RuntimeException;
+use WellRested\Serializer\Attributes\Field;
 
 class TypeDefinitionFactory implements TypeDefinitionFactoryInterface
 {
@@ -71,6 +72,7 @@ class TypeDefinitionFactory implements TypeDefinitionFactoryInterface
 			'string' == $type => new StringTypeDefinition(),
 			'array' == $type => new ArrayTypeDefinition(new MixedTypeDefinition()),
 			'mixed' == $type => new MixedTypeDefinition(),
+			default => throw new RuntimeException('unhandled case'),
 		};
 
 		if (!$allowsNull) {
@@ -146,9 +148,11 @@ class TypeDefinitionFactory implements TypeDefinitionFactoryInterface
 
 	/**
 	 * Honestly ChatGPT'd this, made life alot easier. Tests should cover this to
-	 * be safe. Looks pretty grim, and there's prpbably a smarter way.
+	 * be safe. Looks pretty grim, and there's probably a smarter way.
 	 *
 	 * One to look at on a rainy day.
+	 *
+	 * @return array<int, string>
 	 */
 	protected function splitTypeString(string $typeString): array
 	{

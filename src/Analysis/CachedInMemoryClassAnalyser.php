@@ -22,7 +22,7 @@ class CachedInMemoryClassAnalyser implements ClassAnalyserInterface
 			return $this->cache;
 		}
 
-		$this->cache = $this->cache->merge($this->analyser->analyse(...func_get_args()));
+		$this->cache = $this->cache->merge($this->analyser->analyse($class, $allowsNull, $context));
 
 		return $this->cache;
 	}

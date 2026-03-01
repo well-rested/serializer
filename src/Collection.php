@@ -43,11 +43,13 @@ abstract class Collection implements IteratorAggregate
 		return $this;
 	}
 
+	/** @return ArrayIterator<int, T> */
 	public function getIterator(): Iterator
 	{
 		return new ArrayIterator($this->items);
 	}
 
+	/** @return array<int, T> */
 	public function all(): array
 	{
 		return $this->items;

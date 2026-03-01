@@ -8,7 +8,6 @@ use ArrayIterator;
 use InvalidArgumentException;
 use Iterator;
 use IteratorAggregate;
-use WellRested\Serializer\Analysis\ClassAnalyses;
 
 /**
  * @template T
@@ -59,7 +58,8 @@ abstract class Dictionary implements IteratorAggregate
 		return array_key_exists($key, $this->items);
 	}
 
-	public function merge(ClassAnalyses $other): static
+	/** @param self<T> $other */
+	public function merge(self $other): static
 	{
 		foreach ($other as $key => $value) {
 			$this->add($key, $value);
@@ -68,6 +68,7 @@ abstract class Dictionary implements IteratorAggregate
 		return $this;
 	}
 
+	/** @return ArrayIterator<string, T> */
 	public function getIterator(): Iterator
 	{
 		return new ArrayIterator($this->items);

@@ -9,6 +9,7 @@ use ReflectionIntersectionType;
 use ReflectionNamedType;
 use ReflectionProperty;
 use ReflectionUnionType;
+use RuntimeException;
 
 enum PropertyTypeName: string
 {
@@ -32,17 +33,29 @@ enum PropertyTypeName: string
 	{
 		$type = $prop->getType();
 
-		return match (true) {
-			null === $type => self::Any,
-			$type instanceof ReflectionNamedType && 'self' === $type->getName() => self::Complex,
-			$type instanceof ReflectionUnionType => self::Union,
-			$type instanceof ReflectionIntersectionType => self::Intersection,
-			Option::class === $type->getName() => self::Option,
-			class_exists($type->getName(), true) => self::Complex,
-			interface_exists($type->getName(), true) => self::Interface,
-			trait_exists($type->getName(), true) => self::Trait,
-			default => self::from($type->getName()),
-		};
+		if ($type === null) {
+			return self::Any;
+		}
+		if ($type instanceof ReflectionUnionType) {
+			return self::Union;
+		}
+
+		if ($type instanceof ReflectionIntersectionType) {
+			return self::Intersection;
+		}
+
+		if ($type instanceof ReflectionNamedType) {
+			return match (true) {
+				'self' === $type->getName() => self::Complex,
+				Option::class === $type->getName() => self::Option,
+				class_exists($type->getName(), true) => self::Complex,
+				interface_exists($type->getName(), true) => self::Interface,
+				trait_exists($type->getName(), true) => self::Trait,
+				default => self::from($type->getName()),
+			};
+		}
+
+		throw new RuntimeException('Unsupported ReflectionProperty type');
 	}
 
 	public function isScalar(): bool

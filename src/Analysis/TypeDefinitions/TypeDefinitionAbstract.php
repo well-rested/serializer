@@ -18,6 +18,13 @@ abstract class TypeDefinitionAbstract
 		return false;
 	}
 
+	/**
+	 * @template T of TypeDefinitionAbstract
+	 * @param class-string<T> $classString
+	 * @phpstan-assert-if-true T $this
+	 *
+	 * @return bool
+	 */
 	public function is(string $classString): bool
 	{
 		return $this instanceof $classString;

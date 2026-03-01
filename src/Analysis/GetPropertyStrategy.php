@@ -21,11 +21,11 @@ class GetPropertyStrategy
 	public function getGetterMethod(): string
 	{
 		if (GetPropertyStrategyMethod::GetterMethod !== $this->method) {
-			throw new RuntimeException('No getterMethod for strategy: ' . (string) $this->method);
+			throw new RuntimeException('No getterMethod for strategy: ' . $this->method->value);
 		}
 
 		if (null === $this->getterMethod) {
-			throw new RuntimeException('Invalid getter strategy, setterMethod is not set when method is ' . (string) $this->method);
+			throw new RuntimeException('Invalid getter strategy, setterMethod is not set when method is ' . $this->method->value);
 		}
 
 		return $this->getterMethod;

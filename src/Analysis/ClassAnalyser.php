@@ -66,29 +66,50 @@ class ClassAnalyser implements ClassAnalyserInterface
 		return $analyses;
 	}
 
-	protected function analyseProperty(ClassAnalyses $classAnalyses, ReflectionProperty $property, ClassAnalysisContext $context): PropertyAnalysis
+	/** @return array<string> */
+	protected function getPossibleTypes(ReflectionProperty $property): array
 	{
+		$possibleTypes = [];
 		$type = PropertyTypeName::fromReflectionProperty($property);
 
-		$possibleTypes = match (true) {
-			/* @var ReflectionUnionType|ReflectionIntersectionType $property */
-			PropertyTypeName::Union === $type || PropertyTypeName::Intersection === $type => array_map(
+		if (PropertyTypeName::Union === $type || PropertyTypeName::Intersection === $type) {
+			$reflectionType = $property->getType();
+
+			if (! $reflectionType instanceof ReflectionUnionType && ! $reflectionType instanceof ReflectionIntersectionType) {
+				throw new RuntimeException('execpected reflection intersection or union type');
+			}
+
+			/** @var array<int, ReflectionNamedType> $reflectionTypes */
+			$reflectionTypes = $reflectionType->getTypes();
+
+			$possibleTypes = array_map(
 				fn(ReflectionNamedType $type) => $type->getName(),
-				$property->getType()->getTypes(),
-			),
-			PropertyTypeName::Complex === $type => [
-				$this->getPropertyTypeName($property),
-			],
-			PropertyTypeName::Option === $type => $this->getTypesFromFieldAttribute($property),
-			PropertyTypeName::Array === $type => $this->getTypesFromFieldAttribute($property),
-			default => [
+				$reflectionTypes,
+			);
+		} elseif (PropertyTypeName::Complex === $type) {
+			$possibleTypes = [$this->getPropertyTypeName($property)];
+		} elseif (PropertyTypeName::Option === $type) {
+			$possibleTypes = $this->getTypesFromFieldAttribute($property);
+		} elseif (PropertyTypeName::Array === $type) {
+			$possibleTypes = $this->getTypesFromFieldAttribute($property);
+		} else {
+			$possibleTypes = [
 				$type->value,
-			],
-		};
+			];
+		}
 
 		if ($this->propertyAllowsNull($property) && !$type->allowsNull()) {
 			$possibleTypes[] = PropertyTypeName::Null->value;
 		}
+
+		return $possibleTypes;
+	}
+
+	protected function analyseProperty(ClassAnalyses $classAnalyses, ReflectionProperty $property, ClassAnalysisContext $context): PropertyAnalysis
+	{
+		$type = PropertyTypeName::fromReflectionProperty($property);
+
+		$possibleTypes = $this->getPossibleTypes($property);
 
 		$this->guardAgainstInfiniteRecursion($type, $property, $context);
 
@@ -105,10 +126,12 @@ class ClassAnalyser implements ClassAnalyserInterface
 		}
 
 		if (PropertyTypeName::Complex == $type && !$context->hasLink($this->getPropertyTypeName($property))) {
+			/** @var ReflectionNamedType $propType */
+			$propType = $property->getType();
 			$classAnalyses->merge(
 				$this->analyse(
-					class: $property->getType()->getName(),
-					allowsNull: $property->getType()->allowsNull(),
+					class: $propType->getName(),
+					allowsNull: $propType->allowsNull(),
 					context: $context,
 				),
 			);
@@ -119,8 +142,14 @@ class ClassAnalyser implements ClassAnalyserInterface
 
 		if ($property->isPromoted()) {
 			$defaultValue = null;
+			$constructorMethod = $property->getDeclaringClass()->getConstructor();
+
+			if ($constructorMethod === null) {
+				throw new RuntimeException('null constructor method');
+			}
+
 			/** @var ReflectionParameter[] $constructorParams */
-			$constructorParams = $property->getDeclaringClass()->getConstructor()->getParameters();
+			$constructorParams = $constructorMethod->getParameters();
 
 			foreach ($constructorParams as $param) {
 				if ($param->getName() == $property->getName()) {
@@ -153,6 +182,9 @@ class ClassAnalyser implements ClassAnalyserInterface
 		return $this->typeDefinitionFactory->fromReflectionProperty($property);
 	}
 
+	/**
+	 * @param ReflectionProperty|ReflectionClass<object> $subject
+	 */
 	protected function getAttributes(ReflectionProperty|ReflectionClass $subject): Attributes
 	{
 		$attributes = new Attributes();
@@ -166,6 +198,8 @@ class ClassAnalyser implements ClassAnalyserInterface
 	/**
 	 * Note that we expect this to run after all possible types have been analysed.
 	 * This is done in the analyseProperty method so should be safe.
+	 *
+	 * @param array<string> $possibleTypes
 	 */
 	protected function determineHoistStrategy(ClassAnalyses $classAnalyses, ReflectionProperty $property, PropertyTypeName $type, array $possibleTypes): HoistStrategy
 	{
@@ -188,11 +222,21 @@ class ClassAnalyser implements ClassAnalyserInterface
 
 			$analysis = $classAnalyses->get($possibleType);
 
+			if (($analysis) === null) {
+				throw new RuntimeException('analysis not found');
+			}
+
 			if (!$analysis->getProperties()->has($attr->property)) {
 				throw new RuntimeException('hoist target not found on type (' . $possibleType . '->' . $attr->property . ') for property: ' . $property->getDeclaringClass()->getName() . '->' . $property->getName());
 			}
 
-			if (!$analysis->getProperties()->get($attr->property)->canGetPropertyValue()) {
+			$propertyAnalysis = $analysis->getProperties()->get($attr->property);
+
+			if ($propertyAnalysis === null) {
+				throw new RuntimeException('property analysis not found');
+			}
+
+			if (!$propertyAnalysis->canGetPropertyValue()) {
 				throw new RuntimeException('hoist target not retrievable (' . $possibleType . '->' . $attr->property . ') for property: ' . $property->getDeclaringClass()->getName() . '->' . $property->getName());
 			}
 		}
@@ -264,7 +308,12 @@ class ClassAnalyser implements ClassAnalyserInterface
 			/** @var ReflectionParameter|null */
 			$constructorParameter = null;
 
-			foreach ($property->getDeclaringClass()->getConstructor()->getParameters() as $parameter) {
+			$constructorMethod = $property->getDeclaringClass()->getConstructor();
+
+			if ($constructorMethod === null) {
+				throw new RuntimeException('no constructor');
+			}
+			foreach ($constructorMethod->getParameters() as $parameter) {
 				if ($parameter->getName() != $property->getName()) {
 					continue;
 				}
@@ -321,7 +370,17 @@ class ClassAnalyser implements ClassAnalyserInterface
 
 		$param = $params[0];
 
-		if ($param->getType()->getName() !== $property->getType()->getName()) {
+		$paramType = $param->getType();
+		$propertyType = $property->getType();
+
+		if (! $paramType instanceof ReflectionNamedType) {
+			throw new RuntimeException('param type is ReflectionNamedType');
+		}
+
+		if (! $propertyType instanceof ReflectionNamedType) {
+			throw new RuntimeException('property type is not ReflectionNamedType');
+		}
+		if ($paramType->getName() !== $propertyType->getName()) {
 			throw new RuntimeException('only argument to setter method, must match type of property: ' . $property->getDeclaringClass()->getName() . '->' . $property->getName());
 		}
 
@@ -336,9 +395,16 @@ class ClassAnalyser implements ClassAnalyserInterface
 		if (PropertyTypeName::Complex !== $type) {
 			return;
 		}
+
+		/** @var class-string $propType */
 		$propType = $this->getPropertyTypeName($property);
 
-		if ($propType === $property->getDeclaringClass()->getName() && !$property->getType()->allowsNull()) {
+		$propertyType = $property->getType();
+
+		if ($propertyType === null) {
+			throw new RuntimeException('property type is null');
+		}
+		if ($propType === $property->getDeclaringClass()->getName() && !$propertyType->allowsNull()) {
 			throw new RuntimeException('Infinite recursion found in class: ' . $context->rootLink()?->getClassName());
 		}
 
@@ -356,7 +422,13 @@ class ClassAnalyser implements ClassAnalyserInterface
 			 *
 			 * @see lib/OpenApi/Tests/Unit/Serialization/Analysis/ClassAnalyserTest.php::testRecursion* methods
 			 */
-			if (!$prop->getType()->allowsNull() && $context->hasLink($prop->getType()->getName()) && !$context->hasANullableLink()) {
+			$propertyType = $prop->getType();
+
+			if (! $propertyType instanceof ReflectionNamedType) {
+				throw new RuntimeException('property type is not ReflectionNamedType');
+			}
+
+			if (!$propertyType->allowsNull() && $context->hasLink($propertyType->getName()) && !$context->hasANullableLink()) {
 				throw new RuntimeException('Infinite recursion found in class: ' . $context->rootLink()?->getClassName());
 			}
 		}
@@ -391,9 +463,14 @@ class ClassAnalyser implements ClassAnalyserInterface
 
 		$field = null === $attr ? null : $attr->newInstance();
 
-		return $field?->name ?? $this->namingStrategy->convert($property->getName());
+		return $field->name ?? $this->namingStrategy->convert($property->getName());
 	}
 
+	/**
+	 * @template T of object
+	 * @param class-string<T> $class
+	 * @return ReflectionClass<T>
+	 */
 	protected function reflect(string $class): ReflectionClass
 	{
 		return new ReflectionClass($class);
@@ -401,7 +478,13 @@ class ClassAnalyser implements ClassAnalyserInterface
 
 	protected function getPropertyTypeName(ReflectionProperty $prop): string
 	{
-		$typeName = $prop->getType()->getName();
+		$propType = $prop->getType();
+
+		if (! $propType instanceof ReflectionNamedType) {
+			throw new RuntimeException('property type was not a ReflectionNamedType');
+		}
+
+		$typeName = $propType->getName();
 
 		if ('self' === $typeName) {
 			return $prop->getDeclaringClass()->getName();

@@ -13,6 +13,7 @@ class PropertyAnalysis
 		protected string $name,
 		protected string $serializedName,
 		protected PropertyTypeName $type,
+		/** @var array<string> */
 		protected array $possibleConcreteTypes,
 		protected SetPropertyStrategy $setterStrategy,
 		protected GetPropertyStrategy $getterStrategy,
@@ -40,7 +41,7 @@ class PropertyAnalysis
 	}
 
 	/**
-	 * @return string[]
+	 * @return array<string>
 	 */
 	public function getPossibleTypes(): array
 	{

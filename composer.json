@@ -7,7 +7,7 @@
         "test": "./vendor/bin/phpunit",
         "csfix": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php src tests",
         "csfix-dry-run": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php --dry-run src tests",
-        "stan": "./vendor/bin/phpstan analyse -c phpstan.neon",
+        "stan": "./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit 512M",
         "lint": [
             "@csfix-dry-run",
             "@stan"

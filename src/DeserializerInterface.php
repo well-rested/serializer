@@ -12,6 +12,7 @@ interface DeserializerInterface
 	/**
 	 * @template T
 	 *
+	 * @param array<int|string, mixed> $data
 	 * @param class-string<T> $target
 	 *
 	 * @return Option<T>

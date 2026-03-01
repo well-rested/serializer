@@ -3,3 +3,6 @@
 # PHPUnit
 .phpunit.cache
 phpunit.xml
+
+# NPM
+node_modules

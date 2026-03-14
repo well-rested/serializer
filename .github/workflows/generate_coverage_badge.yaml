@@ -1,0 +1,47 @@
+name: Generate coverage badge
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+env:
+  IMG_NAME: well-rested/serializer:testing
+
+jobs:
+  badge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build runtime image
+        run: IMG_BASE_VERSION=8.4 IMG_TAG=${{ env.IMG_NAME }} make build
+      - name: Install composer dependencies
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer install
+      - name: Generate coverage badge
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer coverage-badge
+      - name: Push badge to badges branch
+        run: |
+          BADGE_SRC="build/coverage-badge.json"
+          BADGE_DEST=".badges/main/coverage-badge.json"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          cp "$BADGE_SRC" /tmp/coverage-badge.json
+
+          git fetch origin badges 2>/dev/null \
+            && git checkout badges \
+            || (git checkout --orphan badges && git rm -rf .)
+
+          mkdir -p "$(dirname "$BADGE_DEST")"
+          cp /tmp/coverage-badge.json "$BADGE_DEST"
+
+          git add "$BADGE_DEST"
+          if git diff --staged --quiet; then
+            echo "Badge unchanged, nothing to push"
+          else
+            git commit -m "update badge $BADGE_DEST"
+            git push origin badges
+          fi

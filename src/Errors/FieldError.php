@@ -11,7 +11,7 @@ class FieldError
 {
 	public function __construct(
 		public protected(set) string $location,
-		public protected(set) string $message,
+		public protected(set) FieldErrorType $type,
 		/** @var Option<mixed> */
 		public protected(set) Option $value,
 	) {}
@@ -21,7 +21,7 @@ class FieldError
 	{
 		$result = [
 			'location' => $this->location,
-			'message' => $this->message,
+			'message' => $this->type->value,
 		];
 
 		if ($this->value->isDefined()) {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Integration\Analysis;
 
 use Generator;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Type;
@@ -20,7 +19,6 @@ use Tests\Integration\Analysis\Fixture\Reflector\PropertyTypes;
 use Tests\Integration\Analysis\Fixture\Reflector\SimpleDummy;
 use WellRested\Serializer\Analysis\Reflector;
 
-#[CoversMethod(Reflector::class, 'getPossibleTypes')]
 class ReflectorTest extends TestCase
 {
 	protected ?Reflector $subject;

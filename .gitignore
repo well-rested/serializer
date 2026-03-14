@@ -3,9 +3,14 @@
 # PHPUnit
 .phpunit.cache
 phpunit.xml
+docs/coverage
+build
 
 # CS Fixer
 .php-cs-fixer.cache
 
 # NPM
 node_modules
+
+# AI Tools
+.claude

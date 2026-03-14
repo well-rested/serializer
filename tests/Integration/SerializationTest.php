@@ -6,7 +6,6 @@ namespace Tests\Integration;
 
 use PhpOption\None;
 use PhpOption\Some;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -38,7 +37,6 @@ use WellRested\Serializer\Normalizers\OptionNormalizer;
 use WellRested\Serializer\Normalizers\UnionNormalizer;
 use WellRested\Serializer\Serializer;
 
-#[CoversClass(Serializer::class)]
 class SerializationTest extends TestCase
 {
 	protected ?Serializer $serializer;

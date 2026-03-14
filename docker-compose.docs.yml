@@ -7,6 +7,10 @@ services:
       - 8794:8000
     working_dir: /app
     restart: unless-stopped
-    command: ["serve", "--watch", "./docs", "--watch", "mkdocs.yml", "-a", "0.0.0.0:8000"]
+    command: 
+      - "serve"
+      - "-a"
+      - "0.0.0.0:8000"
+      - "--livereload"
     volumes:
       - .:/app

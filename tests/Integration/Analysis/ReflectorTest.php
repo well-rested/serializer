@@ -7,6 +7,8 @@ namespace Tests\Integration\Analysis;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use stdClass;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
@@ -26,6 +28,14 @@ class ReflectorTest extends TestCase
 	public function setUp(): void
 	{
 		$this->subject = new Reflector();
+	}
+
+	public function test_reflect_class_returns_reflection_class(): void
+	{
+		$result = $this->subject->reflectClass(stdClass::class);
+
+		$this->assertInstanceOf(ReflectionClass::class, $result);
+		$this->assertSame(stdClass::class, $result->getName());
 	}
 
 	#[DataProvider('scenarios')]

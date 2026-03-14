@@ -1,0 +1,23 @@
+{
+    "name": "well-rested/serializer",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "args": {
+            "IMG_BASE_VERSION": "8.4"
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/srv,type=bind",
+    "workspaceFolder": "/srv",
+    "remoteUser": "root",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bmewburn.vscode-intelephense-client",
+                "Anthropic.claude-code",
+                "ms-azuretools.vscode-containers",
+                "MehediDracula.php-namespace-resolver",
+                "SanderRonde.phpstan-vscode"
+            ]
+        }
+    }
+}

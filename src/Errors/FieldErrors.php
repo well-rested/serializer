@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace WellRested\Serializer\Errors;
 
-use WellRested\Serializer\Collection;
+use WellRested\Serializer\Util\Collection;
 
 /**
  * @extends Collection<FieldError>

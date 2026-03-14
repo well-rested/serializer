@@ -2,7 +2,7 @@ ARG IMG_BASE_VERSION="8.4"
 FROM php:${IMG_BASE_VERSION}-cli
 
 RUN apt-get update \
-    && apt-get install -y libzip-dev zip \
+    && apt-get install -y libzip-dev zip git \
     && docker-php-ext-install zip
 
 COPY ./scripts/install_composer.sh /install_composer.sh

@@ -4,6 +4,7 @@
 .phpunit.cache
 phpunit.xml
 docs/coverage
+build
 
 # CS Fixer
 .php-cs-fixer.cache

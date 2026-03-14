@@ -7,6 +7,7 @@
         "test": "./vendor/bin/phpunit --no-coverage",
         "coverage": "./vendor/bin/phpunit --coverage-text",
         "coverage-html": "./vendor/bin/phpunit --coverage-html docs/coverage",
+        "coverage-check": "./vendor/bin/phpunit --coverage-clover build/coverage.xml && php scripts/check-coverage.php",
         "csfix": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php src tests",
         "csfix-dry-run": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.php --dry-run src tests",
         "stan": "./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit 512M",

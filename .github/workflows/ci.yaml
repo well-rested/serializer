@@ -38,6 +38,8 @@ jobs:
         run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer stan
       - name: "phpunit"
         run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer test
+      - name: "coverage threshold"
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer coverage-check
 
   # Here so we can have a reliable status check for branch rulesets
   # Simply pointing the ruleset at the matrix, it gets stuck in waiting for status to be reported.

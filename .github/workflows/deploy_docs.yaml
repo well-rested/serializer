@@ -7,6 +7,9 @@ on:
 permissions:
   contents: write
 
+env:
+  IMG_NAME: well-rested/serializer:testing
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,15 +19,21 @@ jobs:
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - name: Build runtime image
+        run: IMG_BASE_VERSION=8.4 IMG_TAG=${{ env.IMG_NAME }} make build
+      - name: Install composer dependencies
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer install
+      - name: Generate HTML coverage report
+        run: docker run -v "$(pwd):/app" -w /app ${{ env.IMG_NAME }} composer coverage-html
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       - uses: actions/cache@v4
         with:
           key: mkdocs-material-${{ env.cache_id }}
-          path: .cache 
+          path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: pip install mkdocs-material 
+      - run: pip install mkdocs-material
       - run: mkdocs gh-deploy --force

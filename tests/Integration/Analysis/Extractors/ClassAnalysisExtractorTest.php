@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Integration\Analysis\Extractors;
 
 use Generator;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Integration\Analysis\Extractors\ClassAnalysisScenarios\NullableLinkFromChildToParent;
@@ -16,8 +15,6 @@ use WellRested\Serializer\Analysis\Extractors\ClassAnalysisExtractor;
 use WellRested\Serializer\Analysis\Extractors\PropertyAnalysisExtractor;
 use WellRested\Serializer\Analysis\Reflector;
 
-#[CoversClass(PropertyAnalysisExtractor::class)]
-#[CoversClass(ClassAnalysisExtractor::class)]
 class ClassAnalysisExtractorTest extends TestCase
 {
 	#[DataProvider('scenarios')]

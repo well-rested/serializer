@@ -18,7 +18,6 @@ use WellRested\Serializer\Analysis\GetPropertyStrategyMethod;
 use WellRested\Serializer\Analysis\HoistStrategy;
 use WellRested\Serializer\Analysis\SetPropertyStrategy;
 use WellRested\Serializer\Analysis\SetPropertyStrategyMethod;
-use WellRested\Serializer\Util\MixedDictionary;
 
 class PropertyAnalysis
 {
@@ -33,11 +32,6 @@ class PropertyAnalysis
 		return $this->type;
 	}
 
-	public function addExtensionResult(string $extensionName, MixedDictionary $dict): void
-	{
-		$this->extensions->add($extensionName, $dict);
-	}
-
 	/** @return Option<mixed> */
 	public function getDefaultValue(): Option
 	{
@@ -47,7 +41,7 @@ class PropertyAnalysis
 			return None::create();
 		}
 
-		if ($ext->get('default_exists', false) !== true) {
+		if ($ext->get('default_exists', false) !== true || $ext->has('value') === false) {
 			return None::create();
 		}
 
@@ -137,10 +131,5 @@ class PropertyAnalysis
 	public function getName(): string
 	{
 		return $this->name;
-	}
-
-	public function allowsNull(): bool
-	{
-		return $this->type->isNullable();
 	}
 }

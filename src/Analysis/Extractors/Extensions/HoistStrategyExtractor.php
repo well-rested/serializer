@@ -30,17 +30,19 @@ class HoistStrategyExtractor implements ExtendsPropertyExtraction
 			enabled: false,
 		);
 
-		$type = $this->reflector->getPropertyType($property->getDeclaringClass()->getName(), $property->getName());
+		if ($attr === null) {
+			return $dict->add('value', $noHoistStrategy);
+		}
 
-		$strategy = match (true) {
-			$attr === null => $noHoistStrategy,
-			$type instanceof ObjectType => $this->handleObjectType($attr->newInstance(), $type),
-			default => throw new RuntimeException('cannot hoist a non object in: ' . $property->getDeclaringClass()->getName() . '->' . $property->getName()),
-		};
+		$instance = $attr->newInstance();
 
-		$dict->add('value', $strategy);
+		$type = $this->reflector->getPropertyType($property->getDeclaringClass()->getName(), $instance->property);
 
-		return $dict;
+		if (! $type instanceof ObjectType) {
+			throw new RuntimeException('cannot hoist a property from a non-object in: ' . $property->getDeclaringClass()->getName() . '->' . $property->getName());
+		}
+
+		return $dict->add('value', $this->handleObjectType($instance, $type));
 	}
 
 	/**

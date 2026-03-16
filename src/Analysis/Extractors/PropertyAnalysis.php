@@ -13,11 +13,13 @@ use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyDefaultValueExt
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyGetterMethodExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertySetterMethodExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\SerializedPropertyNameExtractor;
+use WellRested\Serializer\Analysis\Extractors\Extensions\WrappingStrategyExtractor;
 use WellRested\Serializer\Analysis\GetPropertyStrategy;
 use WellRested\Serializer\Analysis\GetPropertyStrategyMethod;
 use WellRested\Serializer\Analysis\HoistStrategy;
 use WellRested\Serializer\Analysis\SetPropertyStrategy;
 use WellRested\Serializer\Analysis\SetPropertyStrategyMethod;
+use WellRested\Serializer\Analysis\WrappingStrategy;
 
 class PropertyAnalysis
 {
@@ -121,6 +123,27 @@ class PropertyAnalysis
 
 		if (! $value instanceof HoistStrategy) {
 			return new HoistStrategy(
+				enabled: false,
+			);
+		}
+
+		return $value;
+	}
+
+	public function getWrappingStrategy(): WrappingStrategy
+	{
+		$ext = $this->extensions->get(WrappingStrategyExtractor::EXTENSION_NAME);
+
+		if ($ext === null) {
+			return new WrappingStrategy(
+				enabled: false,
+			);
+		}
+
+		$value = $ext->get('value');
+
+		if (! $value instanceof WrappingStrategy) {
+			return new WrappingStrategy(
 				enabled: false,
 			);
 		}

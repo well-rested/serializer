@@ -18,6 +18,7 @@ use WellRested\Serializer\Analysis\GetPropertyStrategyMethod;
 use WellRested\Serializer\Analysis\SetPropertyStrategyMethod;
 use WellRested\Serializer\Errors\FieldError;
 use WellRested\Serializer\Errors\FieldErrors;
+use WellRested\Serializer\Errors\FieldErrorType;
 use WellRested\Serializer\Normalizers\Contracts\DenormalizerAwareInterface;
 use WellRested\Serializer\Normalizers\Contracts\DenormalizerInterface;
 use WellRested\Serializer\Normalizers\Contracts\NormalizerAwareInterface;
@@ -36,17 +37,30 @@ class ObjectNormalizer implements DenormalizerInterface, DenormalizerAwareInterf
 
 	public function supportsDenormalization(Option $data, Type $type): bool
 	{
-		return $type instanceof ObjectType && $data->isDefined() && is_array($data->get());
+		return $type instanceof ObjectType;
 	}
 
 	public function denormalize(Option $data, Type $type, string $path): mixed
 	{
 		assert($type instanceof ObjectType);
 
-		assert($data->isDefined());
+		if (! $data->isDefined()) {
+			return new FieldError(
+				location: $path,
+				type: FieldErrorType::ValueIsRequired,
+				value: None::create(),
+			);
+		}
 
 		$value = $data->get();
-		assert(is_array($value));
+
+		if (! is_array($value)) {
+			return new FieldError(
+				location: $path,
+				type: FieldErrorType::ValueIsInvalidType,
+				value: Some::create($value),
+			);
+		}
 
 		/** @var class-string $className */
 		$className = $type->getClassName();
@@ -160,6 +174,25 @@ class ObjectNormalizer implements DenormalizerInterface, DenormalizerAwareInterf
 	{
 		$serializedName = $property->getSerializedPropertyName();
 		$propertyPath = $path !== '' ? $path . '.' . $serializedName : $serializedName;
+
+		// dump($data);
+		$wrappingStrategy = $property->getWrappingStrategy();
+
+		if ($wrappingStrategy->isEnabled()) {
+			$data = $data[$serializedName] ?? [];
+			/** @var string $serializedName should not be possible for key to be null here */
+			$serializedName = $wrappingStrategy->getKey();
+			$propertyPath .= '.' . $serializedName;
+
+			if (! is_array($data)) {
+				return new FieldError(
+					location: $propertyPath,
+					type: FieldErrorType::ValueIsInvalidType,
+					value: Some::create($data),
+				);
+			}
+		}
+
 		$isInData = array_key_exists($serializedName, $data);
 
 		$propVal = match (true) {
@@ -223,6 +256,14 @@ class ObjectNormalizer implements DenormalizerInterface, DenormalizerAwareInterf
 				}
 
 				continue;
+			}
+
+			$wrappingStrategy = $property->getWrappingStrategy();
+
+			if ($wrappingStrategy->isEnabled()) {
+				$normalizedPropValue = [
+					$wrappingStrategy->getKey() => $normalizedPropValue,
+				];
 			}
 
 			$normalized[$property->getSerializedPropertyName()] = $normalizedPropValue;

@@ -11,7 +11,7 @@ use WellRested\Serializer\Normalizers\Contracts\DenormalizerInterface;
 
 trait DenormalizesRecursively
 {
-	protected ?DenormalizerInterface $recursiveDenormalizer;
+	protected ?DenormalizerInterface $recursiveDenormalizer = null;
 
 	public function withDenormalizer(DenormalizerInterface $denormalizer): void
 	{

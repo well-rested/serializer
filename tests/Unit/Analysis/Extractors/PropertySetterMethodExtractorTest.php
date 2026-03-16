@@ -84,7 +84,7 @@ class PropertySetterMethodExtractorTest extends TestCase
 		$prop = new ReflectionProperty(ReadonlySetterFixture::class, 'readonlyProp');
 
 		$this->expectException(RuntimeException::class);
-		$this->expectExceptionMessage('property or class is readonly so all properties be promoted via constructor');
+		$this->expectExceptionMessage('property or class is readonly so all properties must be promoted via constructor');
 
 		$this->extractor->extract($prop);
 	}

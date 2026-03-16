@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use PhpOption\None;
+use PhpOption\Option;
 use PhpOption\Some;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Tests\Integration\Fixture\AllStandardTypesWithPublicSetters;
 use Tests\Integration\Fixture\DefaultValues;
 use Tests\Integration\Fixture\Hierarchy\Btm;
@@ -32,6 +36,7 @@ use WellRested\Serializer\Errors\FieldErrors;
 use WellRested\Serializer\Errors\FieldErrorType;
 use WellRested\Serializer\Exceptions\DeserializationException;
 use WellRested\Serializer\Naming\SnakeCaseNamingStrategy;
+use WellRested\Serializer\Normalizers\Contracts\NormalizerInterface;
 use WellRested\Serializer\Normalizers\CollectionNormalizer;
 use WellRested\Serializer\Normalizers\GenericNormalizer;
 use WellRested\Serializer\Normalizers\ObjectNormalizer;
@@ -372,5 +377,59 @@ class DeserializationTest extends TestCase
 			$expect,
 			$value,
 		);
+	}
+
+	#[Group('serializer.deserialization')]
+	public function test_get_raised_errors_returns_empty_after_successful_deserialization(): void
+	{
+		$this->serializer->deserialize([
+			'some_string' => 'blah',
+			'some_int' => 1234,
+			'some_bool' => true,
+		], PublicPromotedProperties::class);
+
+		$this->assertThatNoErrorsWereRaised();
+	}
+
+	#[Group('serializer.deserialization')]
+	public function test_supports_denormalization_returns_true(): void
+	{
+		$this->assertTrue($this->serializer->supportsDenormalization(
+			None::create(),
+			new ObjectType(stdClass::class),
+		));
+	}
+
+	#[Group('serializer.deserialization')]
+	public function test_denormalize_throws_when_no_denormalizer_found(): void
+	{
+		$serializer = new Serializer([]);
+
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage('no normalizer found for value type:');
+
+		$serializer->denormalize(None::create(), new ObjectType(stdClass::class), '');
+	}
+
+	#[Group('serializer.deserialization')]
+	public function test_denormalize_skips_non_denormalizer_interface_objects(): void
+	{
+		$normalizerOnly = new class implements NormalizerInterface {
+			public function normalize(Option $data, Type $type, string $path): mixed
+			{
+				return null;
+			}
+
+			public function supportsNormalization(Option $data, Type $type): bool
+			{
+				return true;
+			}
+		};
+
+		$serializer = new Serializer([$normalizerOnly]);
+
+		$this->expectException(RuntimeException::class);
+
+		$serializer->denormalize(None::create(), new ObjectType(stdClass::class), '');
 	}
 }

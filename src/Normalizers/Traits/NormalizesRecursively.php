@@ -11,7 +11,7 @@ use WellRested\Serializer\Normalizers\Contracts\NormalizerInterface;
 
 trait NormalizesRecursively
 {
-	protected ?NormalizerInterface $recursiveNormalizer;
+	protected ?NormalizerInterface $recursiveNormalizer = null;
 
 	public function withNormalizer(NormalizerInterface $denormalizer): void
 	{

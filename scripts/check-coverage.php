@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$threshold = 60.0;
+$threshold = 90.0;
 $cloverFile = 'build/coverage.xml';
 
 if (!file_exists($cloverFile)) {

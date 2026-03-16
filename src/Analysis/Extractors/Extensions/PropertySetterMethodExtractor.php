@@ -24,7 +24,7 @@ class PropertySetterMethodExtractor implements ExtendsPropertyExtraction
 		$strategy = match (true) {
 			($property->getAttributes(SetVia::class)[0] ?? null) !== null => $this->handleSetViaAttribute($property),
 			$property->isPromoted() => $this->handlePromoted($property),
-			$property->isReadOnly() || $property->getDeclaringClass()->isReadOnly() => throw new RuntimeException('property or class is readonly so all properties be promoted via constructor: ' . $property->getDeclaringClass()->getName() . '->' . $property->getName()),
+			$property->isReadOnly() || $property->getDeclaringClass()->isReadOnly() => throw new RuntimeException('property or class is readonly so all properties must be promoted via constructor: ' . $property->getDeclaringClass()->getName() . '->' . $property->getName()),
 			$property->isPublic() && !$property->isPrivateSet() && !$property->isProtectedSet() => new SetPropertyStrategy(
 				method: SetPropertyStrategyMethod::PublicSetter,
 			),

@@ -58,8 +58,8 @@ class PropertyGetterMethodExtractor implements ExtendsPropertyExtraction
 			throw new RuntimeException('invalid number of args for getter method, found ' . count($params) . ' (expected exactly 0) : ' . $property->getDeclaringClass()->getName() . '->' . $property->getName());
 		}
 
-		if ($method->getReturnType() != $property->getType()) {
-			throw new RuntimeException('return type from setter method, must match type of property: ' . $property->getDeclaringClass()->getName() . '->' . $property->getName());
+		if ((string) $method->getReturnType() !== (string) $property->getType()) {
+			throw new RuntimeException('return type from getter method, must match type of property: ' . $property->getDeclaringClass()->getName() . '->' . $property->getName());
 		}
 
 		return new GetPropertyStrategy(

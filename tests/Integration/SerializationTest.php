@@ -23,6 +23,7 @@ use Tests\Integration\Fixture\OptionalPromotedProperties;
 use Tests\Integration\Fixture\PublicPromotedProperties;
 use Tests\Integration\Fixture\Union\Container;
 use Tests\Integration\Fixture\Union\TypeA;
+use Tests\Integration\Fixture\WrappedInt;
 use Tests\Integration\Fixture\WrappedPublicPromotedProperties;
 use WellRested\Serializer\Analysis\Extractors\ClassAnalysisExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\HoistStrategyExtractor;
@@ -355,7 +356,7 @@ class SerializationTest extends TestCase
 		$serializer->normalize(None::create(), new ObjectType(stdClass::class), '');
 	}
 
-	public function test_wrapped_field(): void
+	public function test_wrapped_object(): void
 	{
 		$value = $this->serializer->serialize(
 			subject: new WrappedPublicPromotedProperties(
@@ -375,6 +376,24 @@ class SerializationTest extends TestCase
 						'some_int' => 1234,
 						'some_bool' => true,
 					],
+				],
+			],
+			$value,
+		);
+	}
+
+	public function test_wrapped_int(): void
+	{
+		$value = $this->serializer->serialize(
+			subject: new WrappedInt(
+				blah: 1234,
+			),
+		);
+
+		$this->assertEquals(
+			[
+				'blah' => [
+					'data' => 1234,
 				],
 			],
 			$value,

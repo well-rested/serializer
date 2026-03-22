@@ -21,12 +21,12 @@ class PolymorphismExtractor implements ExtendsPropertyExtraction
 		protected Reflector $reflector,
 	) {}
 
-	public function isValidUnion(Type $type): bool
+	protected function isValidUnion(Type $type): bool
 	{
 		if ($type instanceof UnionType) {
 			foreach ($type->getTypes() as $subType) {
 				// Can be an object, but can't be an interface as we can't construct one of those
-				if (! $subType instanceof ObjectType || $this->isInterface($subType)) {
+				if (! $subType instanceof ObjectType) {
 					return false;
 				}
 			}
@@ -35,16 +35,6 @@ class PolymorphismExtractor implements ExtendsPropertyExtraction
 		}
 
 		return false;
-	}
-
-	public function isInterface(Type $type): bool
-	{
-		if (! $type instanceof ObjectType) {
-			return false;
-		}
-
-		$className = $type->getClassName();
-		return interface_exists($className);
 	}
 
 	public function extract(ReflectionProperty $property): MixedDictionary

@@ -41,7 +41,7 @@ use WellRested\Serializer\Exceptions\DeserializationException;
 use WellRested\Serializer\Naming\SnakeCaseNamingStrategy;
 use WellRested\Serializer\Normalizers\CollectionNormalizer;
 use WellRested\Serializer\Normalizers\Contracts\NormalizerInterface;
-use WellRested\Serializer\Normalizers\GenericNormalizer;
+use WellRested\Serializer\Normalizers\FallbackNormalizer;
 use WellRested\Serializer\Normalizers\ObjectNormalizer;
 use WellRested\Serializer\Normalizers\OptionNormalizer;
 use WellRested\Serializer\Normalizers\UnionNormalizer;
@@ -79,7 +79,7 @@ class DeserializationTest extends TestCase
 				new UnionNormalizer(),
 				new ObjectNormalizer($extractor),
 				new CollectionNormalizer(),
-				new GenericNormalizer(),
+				new FallbackNormalizer(),
 			],
 		);
 	}

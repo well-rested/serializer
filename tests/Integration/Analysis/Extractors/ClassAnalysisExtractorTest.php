@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Integration\Analysis\Extractors\ClassAnalysisScenarios\NullableLinkFromChildToParent;
 use Tests\Integration\Analysis\Extractors\ClassAnalysisScenarios\NullableRecursionWithSelf;
+use Tests\Integration\Analysis\Extractors\ClassAnalysisScenarios\PolymorphicUnion;
 use Tests\Integration\Analysis\Extractors\ClassAnalysisScenarios\PromotedOptionalFields;
 use Tests\Integration\Analysis\Extractors\ClassAnalysisScenarios\SettersAndGetters;
 use WellRested\Serializer\Analysis\Extractors\ClassAnalysisExtractor;
@@ -38,5 +39,6 @@ class ClassAnalysisExtractorTest extends TestCase
 		yield 'nullable_recursion_with_self' => [NullableRecursionWithSelf::class];
 		yield 'nullable_link_from_child_to_parent' => [NullableLinkFromChildToParent::class];
 		yield 'promoted_optional_fields' => [PromotedOptionalFields::class];
+		yield 'polymorphic_union_type' => [PolymorphicUnion::class];
 	}
 }

@@ -2,3 +2,7 @@ parameters:
 	level: 10
 	paths:
 		- src
+	# In some scenarios, we narrow the type with a doc block, but it's not strictly true immediately. For example an 
+	# array<string, mixed>, where we expect the keys to be strings in a constructor, but then the constructor is verifying
+	# that the keys are in fact strings. See Polymorphic attribute for an example.
+	treatPhpDocTypesAsCertain: false

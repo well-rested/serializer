@@ -236,9 +236,6 @@ class ObjectNormalizer implements DenormalizerInterface, DenormalizerAwareInterf
 
 			$propValue = match ($getterStrategy->getMethod()->value) {
 				GetPropertyStrategyMethod::PublicGetter->value => $container->{$property->getName()},
-				// Stan complains that the second case is always true, because right now there are no unsupported methods
-				// but this is here to catch it in future if we do add any more.
-				// @phpstan-ignore-next-line match.alwaysTrue
 				GetPropertyStrategyMethod::GetterMethod->value => $container->{$getterStrategy->getGetterMethod()}(),
 				default => throw new RuntimeException("unsupported getter strategy: " . $getterStrategy->getMethod()->value),
 			};

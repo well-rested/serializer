@@ -15,7 +15,7 @@ use WellRested\Serializer\Normalizers\Contracts\DenormalizerInterface;
 use WellRested\Serializer\Normalizers\Contracts\NormalizerInterface;
 use WellRested\Serializer\Normalizers\Traits\ValidatesValueTypes;
 
-class GenericNormalizer implements DenormalizerInterface, NormalizerInterface
+class FallbackNormalizer implements DenormalizerInterface, NormalizerInterface
 {
 	use ValidatesValueTypes;
 

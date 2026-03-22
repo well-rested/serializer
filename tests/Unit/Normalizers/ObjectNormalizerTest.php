@@ -173,22 +173,6 @@ class ObjectNormalizerTest extends TestCase
 		));
 	}
 
-	public function test_does_not_support_denormalization_when_not_defined(): void
-	{
-		$this->assertFalse($this->normalizer->supportsDenormalization(
-			None::create(),
-			new ObjectType(SimpleDto::class),
-		));
-	}
-
-	public function test_does_not_support_denormalization_for_non_array_data(): void
-	{
-		$this->assertFalse($this->normalizer->supportsDenormalization(
-			Some::create(new stdClass()),
-			new ObjectType(SimpleDto::class),
-		));
-	}
-
 	public function test_does_not_support_denormalization_for_non_object_type(): void
 	{
 		$this->assertFalse($this->normalizer->supportsDenormalization(

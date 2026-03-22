@@ -23,20 +23,23 @@ use Tests\Integration\Fixture\OptionalPromotedProperties;
 use Tests\Integration\Fixture\PublicPromotedProperties;
 use Tests\Integration\Fixture\Union\Container;
 use Tests\Integration\Fixture\Union\TypeA;
+use Tests\Integration\Fixture\WrappedInt;
+use Tests\Integration\Fixture\WrappedPublicPromotedProperties;
 use WellRested\Serializer\Analysis\Extractors\ClassAnalysisExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\HoistStrategyExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyDefaultValueExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyGetterMethodExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertySetterMethodExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\SerializedPropertyNameExtractor;
+use WellRested\Serializer\Analysis\Extractors\Extensions\WrappingStrategyExtractor;
 use WellRested\Serializer\Analysis\Extractors\PropertyAnalysisExtractor;
 use WellRested\Serializer\Analysis\Reflector;
 use WellRested\Serializer\Errors\FieldErrors;
 use WellRested\Serializer\Exceptions\DeserializationException;
 use WellRested\Serializer\Naming\SnakeCaseNamingStrategy;
-use WellRested\Serializer\Normalizers\Contracts\DenormalizerInterface;
 use WellRested\Serializer\Normalizers\CollectionNormalizer;
-use WellRested\Serializer\Normalizers\GenericNormalizer;
+use WellRested\Serializer\Normalizers\Contracts\DenormalizerInterface;
+use WellRested\Serializer\Normalizers\FallbackNormalizer;
 use WellRested\Serializer\Normalizers\ObjectNormalizer;
 use WellRested\Serializer\Normalizers\OptionNormalizer;
 use WellRested\Serializer\Normalizers\UnionNormalizer;
@@ -60,6 +63,7 @@ class SerializationTest extends TestCase
 					),
 					new PropertySetterMethodExtractor(),
 					new PropertyGetterMethodExtractor(),
+					new WrappingStrategyExtractor(),
 					new HoistStrategyExtractor(
 						reflector: new Reflector(),
 					),
@@ -73,7 +77,7 @@ class SerializationTest extends TestCase
 				new UnionNormalizer(),
 				new ObjectNormalizer($extractor),
 				new CollectionNormalizer(),
-				new GenericNormalizer(),
+				new FallbackNormalizer(),
 			],
 		);
 	}
@@ -350,5 +354,49 @@ class SerializationTest extends TestCase
 		$this->expectException(RuntimeException::class);
 
 		$serializer->normalize(None::create(), new ObjectType(stdClass::class), '');
+	}
+
+	public function test_wrapped_object(): void
+	{
+		$value = $this->serializer->serialize(
+			subject: new WrappedPublicPromotedProperties(
+				body: new PublicPromotedProperties(
+					someString: 'blah',
+					someBool: true,
+					someInt: 1234,
+				),
+			),
+		);
+
+		$this->assertEquals(
+			[
+				'body' => [
+					'data' => [
+						'some_string' => 'blah',
+						'some_int' => 1234,
+						'some_bool' => true,
+					],
+				],
+			],
+			$value,
+		);
+	}
+
+	public function test_wrapped_int(): void
+	{
+		$value = $this->serializer->serialize(
+			subject: new WrappedInt(
+				blah: 1234,
+			),
+		);
+
+		$this->assertEquals(
+			[
+				'blah' => [
+					'data' => 1234,
+				],
+			],
+			$value,
+		);
 	}
 }

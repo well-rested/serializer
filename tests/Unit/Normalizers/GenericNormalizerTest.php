@@ -14,18 +14,18 @@ use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use WellRested\Serializer\Errors\FieldError;
 use WellRested\Serializer\Errors\FieldErrorType;
-use WellRested\Serializer\Normalizers\GenericNormalizer;
+use WellRested\Serializer\Normalizers\FallbackNormalizer;
 use stdClass;
 
-#[CoversClass(GenericNormalizer::class)]
+#[CoversClass(FallbackNormalizer::class)]
 class GenericNormalizerTest extends TestCase
 {
-	private GenericNormalizer $normalizer;
+	private FallbackNormalizer $normalizer;
 
 	public function setUp(): void
 	{
 		parent::setUp();
-		$this->normalizer = new GenericNormalizer();
+		$this->normalizer = new FallbackNormalizer();
 	}
 
 	// --- supportsDenormalization ---

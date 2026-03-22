@@ -19,7 +19,8 @@
                 "SanderRonde.phpstan-vscode",
                 "foxundermoon.shell-format",
                 "eamodio.gitlens",
-                "reduckted.vscode-gitweblinks"
+                "reduckted.vscode-gitweblinks",
+                "emallin.phpunit"
             ]
         }
     }

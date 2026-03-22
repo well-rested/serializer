@@ -16,7 +16,10 @@
                 "Anthropic.claude-code",
                 "ms-azuretools.vscode-containers",
                 "MehediDracula.php-namespace-resolver",
-                "SanderRonde.phpstan-vscode"
+                "SanderRonde.phpstan-vscode",
+                "foxundermoon.shell-format",
+                "eamodio.gitlens",
+                "reduckted.vscode-gitweblinks"
             ]
         }
     }

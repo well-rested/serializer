@@ -7,7 +7,9 @@ namespace Tests\Unit\Attributes\Fixture;
 use WellRested\Serializer\Attributes\Field;
 use WellRested\Serializer\Attributes\GetVia;
 use WellRested\Serializer\Attributes\Hoist;
+use WellRested\Serializer\Attributes\Polymorphic;
 use WellRested\Serializer\Attributes\SetVia;
+use stdClass;
 
 class AttributeFixture
 {
@@ -31,4 +33,10 @@ class AttributeFixture
 
 	#[Hoist('items')]
 	public mixed $hoistProperty = null;
+
+	#[Polymorphic(typeMap: ['cat' => stdClass::class, 'dog' => stdClass::class])]
+	public mixed $polymorphicWithDefaults = null;
+
+	#[Polymorphic(typeMap: ['cat' => stdClass::class], field: 'kind')]
+	public mixed $polymorphicWithCustomField = null;
 }

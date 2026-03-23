@@ -11,6 +11,7 @@ use RuntimeException;
 use stdClass;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use WellRested\Serializer\Analysis\Extractors\ClassAnalysis;
 use WellRested\Serializer\Analysis\Extractors\ClassAnalysisExtractor;
 use WellRested\Serializer\Analysis\Extractors\PropertyAnalysis;
@@ -201,7 +202,47 @@ class ObjectNormalizer implements DenormalizerInterface, DenormalizerAwareInterf
 			default => None::create(),
 		};
 
-		return $this->recursivelyDenormalize($propVal, $property->getType(), $propertyPath);
+		$type = $property->getType();
+
+		$polymorphismStrategy = $property->getPolymorphismStrategy();
+
+		if ($polymorphismStrategy->enabled() && $isInData) {
+			$fieldData = $data[$serializedName];
+
+			if (! is_array($fieldData)) {
+				return new FieldError(
+					location: $propertyPath,
+					type: FieldErrorType::ValueIsInvalidType,
+					value: Some::create($data[$serializedName]),
+				);
+			}
+
+			/** @var string $polymorphicType */
+			$polymorphicType = $fieldData[$polymorphismStrategy->field()] ?? null;
+
+			if ($polymorphicType === null) {
+				return new FieldError(
+					location: $propertyPath . '.' . $polymorphismStrategy->field(),
+					type: FieldErrorType::MissingPolymorphicTypeDiscriminator,
+					value: Some::create($data[$serializedName]),
+				);
+			}
+
+			$className = $polymorphismStrategy->typeMap()[$polymorphicType] ?? null;
+
+			if ($className === null) {
+				return new FieldError(
+					location: $propertyPath . '.' . $polymorphismStrategy->field(),
+					type: FieldErrorType::UnsatisfiableUnionType,
+					// @phpstan-ignore-next-line argument.type
+					value: Some::create($polymorphicType),
+				);
+			}
+
+			$type = $this->getUnionSubTypeForClass($className, $type, $path);
+		}
+
+		return $this->recursivelyDenormalize($propVal, $type, $propertyPath);
 	}
 
 	public function normalize(Option $data, Type $type, string $path): mixed
@@ -236,18 +277,11 @@ class ObjectNormalizer implements DenormalizerInterface, DenormalizerAwareInterf
 
 			$propValue = match ($getterStrategy->getMethod()->value) {
 				GetPropertyStrategyMethod::PublicGetter->value => $container->{$property->getName()},
-				// Stan complains that the second case is always true, because right now there are no unsupported methods
-				// but this is here to catch it in future if we do add any more.
-				// @phpstan-ignore-next-line match.alwaysTrue
 				GetPropertyStrategyMethod::GetterMethod->value => $container->{$getterStrategy->getGetterMethod()}(),
 				default => throw new RuntimeException("unsupported getter strategy: " . $getterStrategy->getMethod()->value),
 			};
 
-			$normalizedPropValue = $this->recursivelyNormalize(
-				data: Some::create($propValue),
-				type: $property->getType(),
-				path: $path . '.' . $property->getSerializedPropertyName(),
-			);
+			$normalizedPropValue = $this->normalizeProperty($property, $propValue, $path);
 
 			// We should never get an option, unless it's None
 			if ($normalizedPropValue instanceof Option) {
@@ -276,6 +310,78 @@ class ObjectNormalizer implements DenormalizerInterface, DenormalizerAwareInterf
 		}
 
 		return $normalized;
+	}
+
+	protected function normalizeProperty(PropertyAnalysis $property, mixed $initialValue, string $path): mixed
+	{
+		$polymorphismStrategy = $property->getPolymorphismStrategy();
+
+		if (! $polymorphismStrategy->enabled()) {
+			return $this->recursivelyNormalize(
+				data: Some::create($initialValue),
+				type: $property->getType(),
+				path: $path . '.' . $property->getSerializedPropertyName(),
+			);
+		}
+
+		if (! is_object($initialValue)) {
+			throw new RuntimeException('failed to normalize polymorphic value at ' . $path . ' : must be an object');
+		}
+
+		$className = get_class($initialValue);
+		$flippedTypeMap = array_flip($polymorphismStrategy->typeMap());
+		$type = $flippedTypeMap[$className] ?? null;
+
+		if ($type === null) {
+			throw new RuntimeException('failed to normalize polymorphic value at ' . $path . ' : got object not found in type map (' . $className . ')');
+		}
+
+		$typeMeta = [
+			$polymorphismStrategy->field() => $type,
+		];
+
+		$concreteType = $this->getUnionSubTypeForClass($className, $property->getType(), $path);
+
+		$normalizedValue = $this->recursivelyNormalize(
+			// Because it is an object, which doesn't match the typehint of mixed,
+			// but is actually encompassed by it.
+			// @phpstan-ignore-next-line argument.type
+			data: Some::create($initialValue),
+			type: $concreteType,
+			path: $path . '.' . $property->getSerializedPropertyName(),
+		);
+
+		if (is_array($normalizedValue)) {
+			return array_merge($normalizedValue, $typeMeta);
+		}
+
+		if ($normalizedValue instanceof stdClass) {
+			return $typeMeta;
+		}
+
+		throw new RuntimeException('failed to normalize polymorphic value at ' . $path . ' : invlaid type');
+	}
+
+	/**
+	 * @param class-string $className
+	 * @return ObjectType<mixed>
+	 */
+	protected function getUnionSubTypeForClass(string $className, Type $type, string $path): ObjectType
+	{
+		if (!$type instanceof UnionType) {
+			throw new RuntimeException('failed to normalize polymorphic value at ' . $path . ' : property was not union type');
+		}
+
+		$concreteTypes = array_values(array_filter(
+			$type->getTypes(),
+			fn(Type $t) => $t instanceof ObjectType && $t->getClassName() === $className,
+		));
+
+		if (count($concreteTypes) !== 1) {
+			throw new RuntimeException('failed to normalize polymorphic value at ' . $path . ' : could not find single concrete type');
+		}
+
+		return $concreteTypes[0];
 	}
 
 	public function supportsNormalization(Option $data, Type $type): bool

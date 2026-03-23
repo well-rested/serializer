@@ -9,6 +9,7 @@ use PhpOption\Option;
 use PhpOption\Some;
 use Symfony\Component\TypeInfo\Type;
 use WellRested\Serializer\Analysis\Extractors\Extensions\HoistStrategyExtractor;
+use WellRested\Serializer\Analysis\Extractors\Extensions\PolymorphismExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyDefaultValueExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyGetterMethodExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertySetterMethodExtractor;
@@ -17,6 +18,7 @@ use WellRested\Serializer\Analysis\Extractors\Extensions\WrappingStrategyExtract
 use WellRested\Serializer\Analysis\GetPropertyStrategy;
 use WellRested\Serializer\Analysis\GetPropertyStrategyMethod;
 use WellRested\Serializer\Analysis\HoistStrategy;
+use WellRested\Serializer\Analysis\PolymorphismStrategy;
 use WellRested\Serializer\Analysis\SetPropertyStrategy;
 use WellRested\Serializer\Analysis\SetPropertyStrategyMethod;
 use WellRested\Serializer\Analysis\WrappingStrategy;
@@ -144,6 +146,27 @@ class PropertyAnalysis
 
 		if (! $value instanceof WrappingStrategy) {
 			return new WrappingStrategy(
+				enabled: false,
+			);
+		}
+
+		return $value;
+	}
+
+	public function getPolymorphismStrategy(): PolymorphismStrategy
+	{
+		$ext = $this->extensions->get(PolymorphismExtractor::EXTENSION_NAME);
+
+		if ($ext === null) {
+			return new PolymorphismStrategy(
+				enabled: false,
+			);
+		}
+
+		$value = $ext->get('value');
+
+		if (! $value instanceof PolymorphismStrategy) {
+			return new PolymorphismStrategy(
 				enabled: false,
 			);
 		}

@@ -27,6 +27,7 @@ use WellRested\Serializer\Analysis\Extractors\PropertyAnalysisExtractionExtensio
 use WellRested\Serializer\Analysis\GetPropertyStrategy;
 use WellRested\Serializer\Analysis\GetPropertyStrategyMethod;
 use WellRested\Serializer\Analysis\HoistStrategy;
+use WellRested\Serializer\Analysis\PolymorphismStrategy;
 use WellRested\Serializer\Analysis\Reflector;
 use WellRested\Serializer\Analysis\SetPropertyStrategy;
 use WellRested\Serializer\Analysis\SetPropertyStrategyMethod;
@@ -94,7 +95,7 @@ class PolymorphicUnion
 				)
 				->add(
 					HoistStrategyExtractor::EXTENSION_NAME,
-					(new MixedDictionary())->add('value', new HoistStrategy(
+					(new MixedDictionary())->add('value', new PolymorphismStrategy(
 						enabled: false,
 					)),
 				),
@@ -125,7 +126,7 @@ class PolymorphicUnion
 				)
 				->add(
 					HoistStrategyExtractor::EXTENSION_NAME,
-					(new MixedDictionary())->add('value', new HoistStrategy(
+					(new MixedDictionary())->add('value', new PolymorphismStrategy(
 						enabled: false,
 					)),
 				),
@@ -158,7 +159,7 @@ class PolymorphicUnion
 				)
 				->add(
 					HoistStrategyExtractor::EXTENSION_NAME,
-					(new MixedDictionary())->add('value', new HoistStrategy(
+					(new MixedDictionary())->add('value', new PolymorphismStrategy(
 						enabled: false,
 					)),
 				),
@@ -207,16 +208,15 @@ class PolymorphicUnion
 						)
 						->add(
 							PolymorphismExtractor::EXTENSION_NAME,
-							(new MixedDictionary())->add('is_polymorphic', true)
-								->add('field', '@type')
-								->add(
-									'type_map',
-									[
-										'a' => TypeA::class,
-										'b' => TypeB::class,
-										'c' => TypeC::class,
-									],
-								),
+							(new MixedDictionary())->add('value', new PolymorphismStrategy(
+								enabled: true,
+								field: '@type',
+								typeMap: [
+									'a' => TypeA::class,
+									'b' => TypeB::class,
+									'c' => TypeC::class,
+								],
+							)),
 						),
 					),
 				),
@@ -259,7 +259,9 @@ class PolymorphicUnion
 						)
 						->add(
 							PolymorphismExtractor::EXTENSION_NAME,
-							(new MixedDictionary())->add('is_polymorphic', false),
+							(new MixedDictionary())->add('value', new PolymorphismStrategy(
+								enabled: false,
+							)),
 						),
 				)),
 			),
@@ -302,7 +304,9 @@ class PolymorphicUnion
 						)
 						->add(
 							PolymorphismExtractor::EXTENSION_NAME,
-							(new MixedDictionary())->add('is_polymorphic', false),
+							(new MixedDictionary())->add('value', new PolymorphismStrategy(
+								enabled: false,
+							)),
 						),
 				)),
 			),
@@ -345,7 +349,9 @@ class PolymorphicUnion
 						)
 						->add(
 							PolymorphismExtractor::EXTENSION_NAME,
-							(new MixedDictionary())->add('is_polymorphic', false),
+							(new MixedDictionary())->add('value', new PolymorphismStrategy(
+								enabled: false,
+							)),
 						),
 				)),
 			),

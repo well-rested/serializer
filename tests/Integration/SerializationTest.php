@@ -23,10 +23,12 @@ use Tests\Integration\Fixture\OptionalPromotedProperties;
 use Tests\Integration\Fixture\PublicPromotedProperties;
 use Tests\Integration\Fixture\Union\Container;
 use Tests\Integration\Fixture\Union\TypeA;
+use Tests\Integration\Fixture\Union\TypeB;
 use Tests\Integration\Fixture\WrappedInt;
 use Tests\Integration\Fixture\WrappedPublicPromotedProperties;
 use WellRested\Serializer\Analysis\Extractors\ClassAnalysisExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\HoistStrategyExtractor;
+use WellRested\Serializer\Analysis\Extractors\Extensions\PolymorphismExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyDefaultValueExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyGetterMethodExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertySetterMethodExtractor;
@@ -64,6 +66,9 @@ class SerializationTest extends TestCase
 					new PropertySetterMethodExtractor(),
 					new PropertyGetterMethodExtractor(),
 					new WrappingStrategyExtractor(),
+					new PolymorphismExtractor(
+						reflector: new Reflector(),
+					),
 					new HoistStrategyExtractor(
 						reflector: new Reflector(),
 					),
@@ -272,7 +277,7 @@ class SerializationTest extends TestCase
 	}
 
 	#[Group('serializer.serialization')]
-	public function test_union(): void
+	public function test_union_type_a(): void
 	{
 		$value = $this->serializer->serialize(new Container(
 			prop: new TypeA(
@@ -283,6 +288,27 @@ class SerializationTest extends TestCase
 		$this->assertEquals(
 			[
 				'prop' => [
+					'@type' => 'a',
+					'name' => 'meh',
+				],
+			],
+			$value,
+		);
+	}
+
+	#[Group('serializer.serialization')]
+	public function test_union_type_b(): void
+	{
+		$value = $this->serializer->serialize(new Container(
+			prop: new TypeB(
+				name: 'meh',
+			),
+		));
+
+		$this->assertEquals(
+			[
+				'prop' => [
+					'@type' => 'b',
 					'name' => 'meh',
 				],
 			],

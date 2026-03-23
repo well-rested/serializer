@@ -23,10 +23,12 @@ use Tests\Integration\Fixture\OptionalPromotedProperties;
 use Tests\Integration\Fixture\PublicPromotedProperties;
 use Tests\Integration\Fixture\Union\Container;
 use Tests\Integration\Fixture\Union\TypeA;
+use Tests\Integration\Fixture\Union\TypeB;
 use Tests\Integration\Fixture\WrappedInt;
 use Tests\Integration\Fixture\WrappedPublicPromotedProperties;
 use WellRested\Serializer\Analysis\Extractors\ClassAnalysisExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\HoistStrategyExtractor;
+use WellRested\Serializer\Analysis\Extractors\Extensions\PolymorphismExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyDefaultValueExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertyGetterMethodExtractor;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PropertySetterMethodExtractor;
@@ -66,6 +68,9 @@ class DeserializationTest extends TestCase
 					new PropertySetterMethodExtractor(),
 					new PropertyGetterMethodExtractor(),
 					new WrappingStrategyExtractor(),
+					new PolymorphismExtractor(
+						reflector: new Reflector(),
+					),
 					new HoistStrategyExtractor(
 						reflector: new Reflector(),
 					),
@@ -361,10 +366,11 @@ class DeserializationTest extends TestCase
 	}
 
 	#[Group('serializer.deserialization')]
-	public function test_union(): void
+	public function test_union_type_a(): void
 	{
 		$data = [
 			'prop' => [
+				'@type' => 'a',
 				'name' => 'meh',
 			],
 		];
@@ -380,6 +386,69 @@ class DeserializationTest extends TestCase
 		$this->assertEquals(
 			$expect,
 			$value,
+		);
+	}
+
+	#[Group('serializer.deserialization')]
+	public function test_union_type_b(): void
+	{
+		$data = [
+			'prop' => [
+				'@type' => 'b',
+				'name' => 'meh',
+			],
+		];
+
+		$value = $this->serializer->deserialize($data, Container::class);
+
+		$expect = new Container(
+			prop: new TypeB(
+				name: 'meh',
+			),
+		);
+
+		$this->assertEquals(
+			$expect,
+			$value,
+		);
+	}
+
+	#[Group('serializer.deserialization')]
+	public function test_union_invalid_type(): void
+	{
+		$data = [
+			'prop' => [
+				'@type' => 'wfob',
+				'name' => 'meh',
+			],
+		];
+
+		$this->assertDeserializationException(
+			fn() => $this->serializer->deserialize($data, Container::class),
+			Container::class,
+			$data,
+			(new FieldErrors())
+				->add(new FieldError('prop.@type', FieldErrorType::UnsatisfiableUnionType, Some::create('wfob'))),
+		);
+	}
+
+	#[Group('serializer.deserialization')]
+	public function test_union_missing_discriminator(): void
+	{
+		$data = [
+			'prop' => [
+				'name' => 'meh',
+			],
+		];
+
+		$this->assertDeserializationException(
+			fn() => $this->serializer->deserialize($data, Container::class),
+			Container::class,
+			$data,
+			(new FieldErrors())
+				->add(new FieldError('prop.@type', FieldErrorType::MissingPolymorphicTypeDiscriminator, Some::create([
+					'name' => 'meh',
+				]))),
 		);
 	}
 

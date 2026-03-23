@@ -9,6 +9,7 @@ use RuntimeException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
+use WellRested\Serializer\Analysis\PolymorphismStrategy;
 use WellRested\Serializer\Analysis\Reflector;
 use WellRested\Serializer\Attributes\Polymorphic;
 use WellRested\Serializer\Util\MixedDictionary;
@@ -94,9 +95,14 @@ class PolymorphismExtractor implements ExtendsPropertyExtraction
 			}
 		}
 
-		return (new MixedDictionary())->add('is_polymorphic', true)
-			->add('field', $attr->field)
-			->add('type_map', $attr->typeMap);
+		return (new MixedDictionary())->add(
+			'value',
+			new PolymorphismStrategy(
+				enabled: true,
+				field: $attr->field,
+				typeMap: $attr->typeMap,
+			),
+		);
 	}
 
 	/**
@@ -117,7 +123,9 @@ class PolymorphismExtractor implements ExtendsPropertyExtraction
 
 	protected function getDisabledConfig(): MixedDictionary
 	{
-		return (new MixedDictionary())->add('is_polymorphic', false);
+		return (new MixedDictionary())->add('value', new PolymorphismStrategy(
+			enabled: false,
+		));
 	}
 
 	protected function getPolymorphicAttribute(ReflectionProperty $property): ?Polymorphic

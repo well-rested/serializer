@@ -20,6 +20,7 @@ use Tests\Unit\Analysis\Extractors\Fixture\Polymorphism\ConcretePolymorphicB;
 use Tests\Unit\Analysis\Extractors\Fixture\Polymorphism\PolymorphicInterface;
 use Tests\Unit\Analysis\Extractors\Fixture\Polymorphism\PolymorphismFixture;
 use WellRested\Serializer\Analysis\Extractors\Extensions\PolymorphismExtractor;
+use WellRested\Serializer\Analysis\PolymorphismStrategy;
 use WellRested\Serializer\Analysis\Reflector;
 use WellRested\Serializer\Util\MixedDictionary;
 
@@ -49,7 +50,9 @@ class PolymorphismExtractorTest extends TestCase
 		$got = $this->extractor->extract($prop);
 
 		$this->assertEquals(
-			(new MixedDictionary())->add('is_polymorphic', false),
+			(new MixedDictionary())->add('value', new PolymorphismStrategy(
+				enabled: false,
+			)),
 			$got,
 		);
 	}
@@ -67,7 +70,9 @@ class PolymorphismExtractorTest extends TestCase
 		$got = $this->extractor->extract($prop);
 
 		$this->assertEquals(
-			(new MixedDictionary())->add('is_polymorphic', false),
+			(new MixedDictionary())->add('value', new PolymorphismStrategy(
+				enabled: false,
+			)),
 			$got,
 		);
 	}
@@ -85,7 +90,9 @@ class PolymorphismExtractorTest extends TestCase
 		$got = $this->extractor->extract($prop);
 
 		$this->assertEquals(
-			(new MixedDictionary())->add('is_polymorphic', false),
+			(new MixedDictionary())->add('value', new PolymorphismStrategy(
+				enabled: false,
+			)),
 			$got,
 		);
 	}
@@ -214,10 +221,11 @@ class PolymorphismExtractorTest extends TestCase
 		$got = $this->extractor->extract($prop);
 
 		$this->assertEquals(
-			(new MixedDictionary())
-				->add('is_polymorphic', true)
-				->add('field', '@type')
-				->add('type_map', ['a' => ConcretePolymorphicA::class, 'b' => ConcretePolymorphicB::class]),
+			(new MixedDictionary())->add('value', new PolymorphismStrategy(
+				enabled: true,
+				field: '@type',
+				typeMap: ['a' => ConcretePolymorphicA::class, 'b' => ConcretePolymorphicB::class],
+			)),
 			$got,
 		);
 	}
@@ -238,10 +246,11 @@ class PolymorphismExtractorTest extends TestCase
 		$got = $this->extractor->extract($prop);
 
 		$this->assertEquals(
-			(new MixedDictionary())
-				->add('is_polymorphic', true)
-				->add('field', 'kind')
-				->add('type_map', ['a' => ConcretePolymorphicA::class, 'b' => ConcretePolymorphicB::class]),
+			(new MixedDictionary())->add('value', new PolymorphismStrategy(
+				enabled: true,
+				field: 'kind',
+				typeMap: ['a' => ConcretePolymorphicA::class, 'b' => ConcretePolymorphicB::class],
+			)),
 			$got,
 		);
 	}

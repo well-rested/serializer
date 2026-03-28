@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /app/src/Serializer/Analysis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../_css/bootstrap.min.css?v=13.0.1" rel="stylesheet" type="text/css">
+  <link href="../_css/billboard.min.css?v=13.0.1" rel="stylesheet" type="text/css">
+  <link href="../_css/style.css?v=13.0.1" rel="stylesheet" type="text/css">
+  <link href="../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../index.html">/app/src/Serializer</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Analysis</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classesCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Reflector.php.html#20">WellRested\Serializer\Analysis\Reflector</a></td><td class="text-right">82%</td></tr>
+       <tr><td><a href="Extractors/PropertyAnalysis.php.html#26">WellRested\Serializer\Analysis\Extractors\PropertyAnalysis</a></td><td class="text-right">83%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Extractors/PropertyAnalysis.php.html#26">WellRested\Serializer\Analysis\Extractors\PropertyAnalysis</a></td><td class="text-right">83.1%</td><td class="text-right">25</td><td class="text-right">28</td></tr>
+       <tr><td><a href="Reflector.php.html#20">WellRested\Serializer\Analysis\Reflector</a></td><td class="text-right">82.4%</td><td class="text-right">13</td><td class="text-right">13</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2 style="margin-top: 3rem;">Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodsCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Reflector.php.html#51"><abbr title="WellRested\Serializer\Analysis\Reflector::overrideType">overrideType</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Extractors/PropertyAnalysis.php.html#135"><abbr title="WellRested\Serializer\Analysis\Extractors\PropertyAnalysis::getWrappingStrategy">getWrappingStrategy</abbr></a></td><td class="text-right">45%</td></tr>
+       <tr><td><a href="Extractors/PropertyAnalysis.php.html#156"><abbr title="WellRested\Serializer\Analysis\Extractors\PropertyAnalysis::getPolymorphismStrategy">getPolymorphismStrategy</abbr></a></td><td class="text-right">45%</td></tr>
+       <tr><td><a href="Extractors/Extensions/PropertySetterMethodExtractor.php.html#39"><abbr title="WellRested\Serializer\Analysis\Extractors\Extensions\PropertySetterMethodExtractor::handlePromoted">handlePromoted</abbr></a></td><td class="text-right">85%</td></tr>
+       <tr><td><a href="Extractors/Extensions/PropertySetterMethodExtractor.php.html#68"><abbr title="WellRested\Serializer\Analysis\Extractors\Extensions\PropertySetterMethodExtractor::handleSetViaAttribute">handleSetViaAttribute</abbr></a></td><td class="text-right">88%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Reflector.php.html#51"><abbr title="WellRested\Serializer\Analysis\Reflector::overrideType">overrideType</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Extractors/Extensions/PropertySetterMethodExtractor.php.html#68"><abbr title="WellRested\Serializer\Analysis\Extractors\Extensions\PropertySetterMethodExtractor::handleSetViaAttribute">handleSetViaAttribute</abbr></a></td><td class="text-right">88.0%</td><td class="text-right">8</td><td class="text-right">8</td></tr>
+       <tr><td><a href="Extractors/Extensions/PropertySetterMethodExtractor.php.html#39"><abbr title="WellRested\Serializer\Analysis\Extractors\Extensions\PropertySetterMethodExtractor::handlePromoted">handlePromoted</abbr></a></td><td class="text-right">85.7%</td><td class="text-right">5</td><td class="text-right">5</td></tr>
+       <tr><td><a href="Extractors/PropertyAnalysis.php.html#135"><abbr title="WellRested\Serializer\Analysis\Extractors\PropertyAnalysis::getWrappingStrategy">getWrappingStrategy</abbr></a></td><td class="text-right">45.5%</td><td class="text-right">3</td><td class="text-right">4</td></tr>
+       <tr><td><a href="Extractors/PropertyAnalysis.php.html#156"><abbr title="WellRested\Serializer\Analysis\Extractors\PropertyAnalysis::getPolymorphismStrategy">getPolymorphismStrategy</abbr></a></td><td class="text-right">45.5%</td><td class="text-right">3</td><td class="text-right">4</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 13.0.1</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.19</a> and <a href="https://phpunit.de/">PHPUnit 13.0.5</a> at Sat Mar 28 11:30:18 UTC 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../_js/billboard.pkgd.min.js?v=13.0.1" type="text/javascript"></script>
+  <script type="application/json" id="complexity_class">[[82.35294117647058,13,"Reflector.php.html#20","WellRested\\Serializer\\Analysis\\Reflector","13.93"],[83.09859154929578,25,"Extractors\/PropertyAnalysis.php.html#26","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis","28.02"],[90.38461538461539,23,"Extractors\/Extensions\/PropertySetterMethodExtractor.php.html#16","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertySetterMethodExtractor","23.47"],[94.44444444444444,7,"Extractors\/Extensions\/PropertyDefaultValueExtractor.php.html#12","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertyDefaultValueExtractor","7.01"],[96.42857142857143,18,"Extractors\/ClassAnalysisExtractor.php.html#15","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor","18"],[96.55172413793103,11,"Extractors\/Extensions\/PropertyGetterMethodExtractor.php.html#14","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertyGetterMethodExtractor","11"],[100,1,"Extractors\/ClassAnalyses.php.html#12","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalyses","1"],[100,3,"Extractors\/ClassAnalysis.php.html#7","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysis","3"],[100,6,"Extractors\/Extensions\/HoistStrategyExtractor.php.html#15","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\HoistStrategyExtractor","6"],[100,22,"Extractors\/Extensions\/PolymorphismExtractor.php.html#17","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PolymorphismExtractor","22"],[100,4,"Extractors\/Extensions\/SerializedPropertyNameExtractor.php.html#12","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\SerializedPropertyNameExtractor","4"],[100,3,"Extractors\/Extensions\/WrappingStrategyExtractor.php.html#12","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\WrappingStrategyExtractor","3"],[100,1,"Extractors\/PropertyAnalyses.php.html#12","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalyses","1"],[100,1,"Extractors\/PropertyAnalysisExtractionExtensions.php.html#13","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysisExtractionExtensions","1"],[100,5,"Extractors\/PropertyAnalysisExtractor.php.html#11","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysisExtractor","5"],[100,5,"GetPropertyStrategy.php.html#9","WellRested\\Serializer\\Analysis\\GetPropertyStrategy","5"],[100,0,"GetPropertyStrategyMethod.php.html#7","WellRested\\Serializer\\Analysis\\GetPropertyStrategyMethod","0"],[100,5,"HoistStrategy.php.html#9","WellRested\\Serializer\\Analysis\\HoistStrategy","5"],[100,8,"PolymorphismStrategy.php.html#9","WellRested\\Serializer\\Analysis\\PolymorphismStrategy","8"],[100,8,"SetPropertyStrategy.php.html#9","WellRested\\Serializer\\Analysis\\SetPropertyStrategy","8"],[100,0,"SetPropertyStrategyMethod.php.html#7","WellRested\\Serializer\\Analysis\\SetPropertyStrategyMethod","0"],[100,3,"Types\/OptionType.php.html#15","WellRested\\Serializer\\Analysis\\Types\\OptionType","3"],[100,3,"WrappingStrategy.php.html#7","WellRested\\Serializer\\Analysis\\WrappingStrategy","3"]]</script>
+  <script type="application/json" id="complexity_method">[[0,3,"Reflector.php.html#51","WellRested\\Serializer\\Analysis\\Reflector::overrideType","12"],[45.45454545454545,3,"Extractors\/PropertyAnalysis.php.html#135","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::getWrappingStrategy","4.46"],[45.45454545454545,3,"Extractors\/PropertyAnalysis.php.html#156","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::getPolymorphismStrategy","4.46"],[85.71428571428571,5,"Extractors\/Extensions\/PropertySetterMethodExtractor.php.html#39","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertySetterMethodExtractor::handlePromoted","5.07"],[88,8,"Extractors\/Extensions\/PropertySetterMethodExtractor.php.html#68","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertySetterMethodExtractor::handleSetViaAttribute","8.11"],[90,2,"Extractors\/ClassAnalysisExtractor.php.html#33","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor::doExtract","2.00"],[92.3076923076923,5,"Reflector.php.html#70","WellRested\\Serializer\\Analysis\\Reflector::overrideOptionType","5.01"],[94.11764705882352,6,"Extractors\/Extensions\/PropertyDefaultValueExtractor.php.html#16","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertyDefaultValueExtractor::extract","6.01"],[94.44444444444444,6,"Extractors\/Extensions\/PropertyGetterMethodExtractor.php.html#35","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertyGetterMethodExtractor::handleGetViaAttribute","6.01"],[100,1,"Extractors\/ClassAnalyses.php.html#14","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalyses::isType","1"],[100,1,"Extractors\/ClassAnalysis.php.html#9","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysis::__construct","1"],[100,1,"Extractors\/ClassAnalysis.php.html#14","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysis::getName","1"],[100,1,"Extractors\/ClassAnalysis.php.html#19","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysis::getProperties","1"],[100,1,"Extractors\/ClassAnalysisExtractor.php.html#17","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor::__construct","1"],[100,1,"Extractors\/ClassAnalysisExtractor.php.html#25","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor::extract","1"],[100,2,"Extractors\/ClassAnalysisExtractor.php.html#53","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor::handleClassDependencies","2"],[100,6,"Extractors\/ClassAnalysisExtractor.php.html#62","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor::extractFromType","6"],[100,2,"Extractors\/ClassAnalysisExtractor.php.html#76","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor::extractFromObjectType","2"],[100,2,"Extractors\/ClassAnalysisExtractor.php.html#91","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor::extractFromUnionType","2"],[100,1,"Extractors\/ClassAnalysisExtractor.php.html#98","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor::extractFromOptionType","1"],[100,1,"Extractors\/ClassAnalysisExtractor.php.html#106","WellRested\\Serializer\\Analysis\\Extractors\\ClassAnalysisExtractor::extractFromNullableType","1"],[100,1,"Extractors\/Extensions\/HoistStrategyExtractor.php.html#19","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\HoistStrategyExtractor::__construct","1"],[100,3,"Extractors\/Extensions\/HoistStrategyExtractor.php.html#23","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\HoistStrategyExtractor::extract","3"],[100,1,"Extractors\/Extensions\/HoistStrategyExtractor.php.html#51","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\HoistStrategyExtractor::handleObjectType","1"],[100,1,"Extractors\/Extensions\/HoistStrategyExtractor.php.html#59","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\HoistStrategyExtractor::extensionId","1"],[100,1,"Extractors\/Extensions\/PolymorphismExtractor.php.html#21","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PolymorphismExtractor::__construct","1"],[100,4,"Extractors\/Extensions\/PolymorphismExtractor.php.html#25","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PolymorphismExtractor::isValidUnion","4"],[100,2,"Extractors\/Extensions\/PolymorphismExtractor.php.html#41","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PolymorphismExtractor::extract","2"],[100,8,"Extractors\/Extensions\/PolymorphismExtractor.php.html#59","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PolymorphismExtractor::getUnionConfig","8"],[100,3,"Extractors\/Extensions\/PolymorphismExtractor.php.html#112","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PolymorphismExtractor::unionContainsClass","3"],[100,1,"Extractors\/Extensions\/PolymorphismExtractor.php.html#124","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PolymorphismExtractor::getDisabledConfig","1"],[100,2,"Extractors\/Extensions\/PolymorphismExtractor.php.html#131","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PolymorphismExtractor::getPolymorphicAttribute","2"],[100,1,"Extractors\/Extensions\/PolymorphismExtractor.php.html#138","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PolymorphismExtractor::extensionId","1"],[100,1,"Extractors\/Extensions\/PropertyDefaultValueExtractor.php.html#51","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertyDefaultValueExtractor::extensionId","1"],[100,4,"Extractors\/Extensions\/PropertyGetterMethodExtractor.php.html#18","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertyGetterMethodExtractor::extract","4"],[100,1,"Extractors\/Extensions\/PropertyGetterMethodExtractor.php.html#71","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertyGetterMethodExtractor::extensionId","1"],[100,9,"Extractors\/Extensions\/PropertySetterMethodExtractor.php.html#20","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertySetterMethodExtractor::extract","9"],[100,1,"Extractors\/Extensions\/PropertySetterMethodExtractor.php.html#116","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\PropertySetterMethodExtractor::extensionId","1"],[100,1,"Extractors\/Extensions\/SerializedPropertyNameExtractor.php.html#16","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\SerializedPropertyNameExtractor::__construct","1"],[100,2,"Extractors\/Extensions\/SerializedPropertyNameExtractor.php.html#20","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\SerializedPropertyNameExtractor::extract","2"],[100,1,"Extractors\/Extensions\/SerializedPropertyNameExtractor.php.html#35","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\SerializedPropertyNameExtractor::extensionId","1"],[100,2,"Extractors\/Extensions\/WrappingStrategyExtractor.php.html#16","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\WrappingStrategyExtractor::extract","2"],[100,1,"Extractors\/Extensions\/WrappingStrategyExtractor.php.html#34","WellRested\\Serializer\\Analysis\\Extractors\\Extensions\\WrappingStrategyExtractor::extensionId","1"],[100,1,"Extractors\/PropertyAnalyses.php.html#14","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalyses::isType","1"],[100,1,"Extractors\/PropertyAnalysis.php.html#28","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::__construct","1"],[100,1,"Extractors\/PropertyAnalysis.php.html#34","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::getType","1"],[100,4,"Extractors\/PropertyAnalysis.php.html#40","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::getDefaultValue","4"],[100,3,"Extractors\/PropertyAnalysis.php.html#55","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::getSerializedPropertyName","3"],[100,3,"Extractors\/PropertyAnalysis.php.html#72","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::getSetterStrategy","3"],[100,3,"Extractors\/PropertyAnalysis.php.html#93","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::getGetterStrategy","3"],[100,3,"Extractors\/PropertyAnalysis.php.html#114","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::getHoistStrategy","3"],[100,1,"Extractors\/PropertyAnalysis.php.html#177","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysis::getName","1"],[100,1,"Extractors\/PropertyAnalysisExtractionExtensions.php.html#15","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysisExtractionExtensions::isType","1"],[100,1,"Extractors\/PropertyAnalysisExtractor.php.html#13","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysisExtractor::__construct","1"],[100,2,"Extractors\/PropertyAnalysisExtractor.php.html#24","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysisExtractor::extract","2"],[100,2,"Extractors\/PropertyAnalysisExtractor.php.html#42","WellRested\\Serializer\\Analysis\\Extractors\\PropertyAnalysisExtractor::analyseProperty","2"],[100,1,"GetPropertyStrategy.php.html#11","WellRested\\Serializer\\Analysis\\GetPropertyStrategy::__construct","1"],[100,1,"GetPropertyStrategy.php.html#16","WellRested\\Serializer\\Analysis\\GetPropertyStrategy::getMethod","1"],[100,3,"GetPropertyStrategy.php.html#21","WellRested\\Serializer\\Analysis\\GetPropertyStrategy::getGetterMethod","3"],[100,1,"HoistStrategy.php.html#11","WellRested\\Serializer\\Analysis\\HoistStrategy::__construct","1"],[100,1,"HoistStrategy.php.html#16","WellRested\\Serializer\\Analysis\\HoistStrategy::enabled","1"],[100,3,"HoistStrategy.php.html#21","WellRested\\Serializer\\Analysis\\HoistStrategy::getProperty","3"],[100,1,"PolymorphismStrategy.php.html#11","WellRested\\Serializer\\Analysis\\PolymorphismStrategy::__construct","1"],[100,1,"PolymorphismStrategy.php.html#18","WellRested\\Serializer\\Analysis\\PolymorphismStrategy::enabled","1"],[100,3,"PolymorphismStrategy.php.html#23","WellRested\\Serializer\\Analysis\\PolymorphismStrategy::field","3"],[100,3,"PolymorphismStrategy.php.html#37","WellRested\\Serializer\\Analysis\\PolymorphismStrategy::typeMap","3"],[100,1,"Reflector.php.html#27","WellRested\\Serializer\\Analysis\\Reflector::__construct","1"],[100,1,"Reflector.php.html#46","WellRested\\Serializer\\Analysis\\Reflector::reflectClass","1"],[100,3,"Reflector.php.html#100","WellRested\\Serializer\\Analysis\\Reflector::getPropertyType","3"],[100,1,"SetPropertyStrategy.php.html#11","WellRested\\Serializer\\Analysis\\SetPropertyStrategy::__construct","1"],[100,1,"SetPropertyStrategy.php.html#17","WellRested\\Serializer\\Analysis\\SetPropertyStrategy::getMethod","1"],[100,3,"SetPropertyStrategy.php.html#22","WellRested\\Serializer\\Analysis\\SetPropertyStrategy::getSetterMethod","3"],[100,3,"SetPropertyStrategy.php.html#35","WellRested\\Serializer\\Analysis\\SetPropertyStrategy::getConstructorIndex","3"],[100,1,"Types\/OptionType.php.html#17","WellRested\\Serializer\\Analysis\\Types\\OptionType::__construct","1"],[100,1,"Types\/OptionType.php.html#21","WellRested\\Serializer\\Analysis\\Types\\OptionType::getWrappedType","1"],[100,1,"Types\/OptionType.php.html#26","WellRested\\Serializer\\Analysis\\Types\\OptionType::__toString","1"],[100,1,"WrappingStrategy.php.html#9","WellRested\\Serializer\\Analysis\\WrappingStrategy::__construct","1"],[100,1,"WrappingStrategy.php.html#14","WellRested\\Serializer\\Analysis\\WrappingStrategy::isEnabled","1"],[100,1,"WrappingStrategy.php.html#19","WellRested\\Serializer\\Analysis\\WrappingStrategy::getKey","1"]]</script>
+  <script type="text/javascript" defer>
+  const barLabels = [
+    '0%',
+    '0-10%',
+    '10-20%',
+    '20-30%',
+    '30-40%',
+    '40-50%',
+    '50-60%',
+    '60-70%',
+    '70-80%',
+    '80-90%',
+    '90-100%',
+    '100%'
+  ];
+  const barConfig = (name, fullName, values) => ({
+    axis: {
+      x: {
+        type: "category",
+        categories: barLabels,
+      },
+      y: {
+        label: {
+          text: `#${name}`,
+          position: 'outer-top',
+        },
+      },
+    },
+    bindto: `#${name}CoverageDistribution`,
+    data: {
+      columns: [
+        [fullName].concat(values),
+      ],
+      colors: {
+        [fullName]: "rgba(69, 114, 167, 0.75)",
+      },
+      type: "bar",
+    },
+    bar: {
+      width: {
+        ratio: 0.9,
+      },
+    },
+    grid: {
+      focus: {
+        show: false,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">Coverage ${barLabels[data[0].x]}</th></tr>
+            <tr><td class="value">${data[0].value} ${name}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  bb.generate(
+    barConfig('classes', "Class Coverage", [0,0,0,0,0,0,0,0,0,2,4,17])
+  );
+  bb.generate(
+    barConfig('methods', "Method Coverage", [1,0,0,0,0,2,0,0,0,2,4,70])
+  );
+
+  const scatterConfig = (name, complexityData) => ({
+    axis: {
+      x: {
+        label: {
+          text: 'Code Coverage (in percent)',
+          position: 'outer-right',
+        },
+        tick: {
+          values: [0, 20, 40, 60, 80, 100],
+        },
+      },
+      y: {
+        label: {
+          text: 'Cyclomatic Complexity',
+          position: 'outer-top',
+        },
+        min: 0,
+        padding: {
+          bottom: 0,
+          top: 5,
+        },
+      },
+    },
+    bindto: `#${name}Complexity`,
+    data: {
+      columns: [
+        ["complexity_x"].concat(complexityData.map(d => d[0])),
+        ["complexity"].concat(complexityData.map(d => d[1])),
+      ],
+      onclick: function(data, element) {
+        window.location = complexityData[data.index][2];
+      },
+      type: "scatter",
+      xs: {
+        "complexity": "complexity_x",
+      },
+    },
+    grid: {
+      focus: {
+        show: true,
+        y: true,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        const coverage = Math.round(data[0].x);
+        const complexity = data[0].value;
+        const targetName = complexityData[data[0].index][3];
+        const crap = complexityData[data[0].index][4];
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">${targetName}</th></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Coverage</td><td class="name">${coverage}%</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Complexity</td><td class="value">${complexity}</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Crap</td><td class="value">${crap}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  const classComplexityData = JSON.parse(document.getElementById('complexity_class').textContent);
+  bb.generate(
+    scatterConfig("class", classComplexityData)
+  );
+  const methodComplexityData = JSON.parse(document.getElementById('complexity_method').textContent);
+  bb.generate(
+    scatterConfig("method", methodComplexityData),
+  );
+  </script>
+ </body>
+</html>
